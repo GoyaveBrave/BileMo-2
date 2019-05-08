@@ -19,6 +19,6 @@ class PhoneListController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $phones = $em->getRepository(Phone::class)->findAll();
 
-        return $this->json($phones, 200, ['Content-Type' => 'application/json']);
+        return $this->json($phones, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 }
