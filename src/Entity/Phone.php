@@ -46,6 +46,11 @@ class Phone
      */
     private $memory;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $price;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +124,18 @@ class Phone
     public function setMemory(?string $memory): self
     {
         $this->memory = $memory;
+
+        return $this;
+    }
+
+    public function getPrice(): ?int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(int $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }
