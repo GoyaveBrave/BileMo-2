@@ -19,7 +19,7 @@ class PhoneCreationController extends AbstractController
      *
      * @return Response
      */
-    public function CreatePhone(Request $request, SerializerInterface $serializer)
+    public function createPhone(Request $request, SerializerInterface $serializer)
     {
         $em = $this->getDoctrine()->getManager();
         $data = $request->getContent();

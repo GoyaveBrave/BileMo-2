@@ -14,7 +14,7 @@ class PhoneListController extends AbstractController
      *
      * @return Response
      */
-    public function GetAllPhones()
+    public function getAllPhones()
     {
         $em = $this->getDoctrine()->getManager();
         $phones = $em->getRepository(Phone::class)->findAll();
