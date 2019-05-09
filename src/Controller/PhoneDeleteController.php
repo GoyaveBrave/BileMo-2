@@ -11,6 +11,8 @@ use Swagger\Annotations as SWG;
 class PhoneDeleteController extends AbstractController
 {
     /**
+     * Delete a phone.
+     *
      * @Route("/phone/delete/{id}", name="phone_delete", methods={"DELETE"})
      *
      * @SWG\Response(
