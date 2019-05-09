@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use DateTime;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,16 +28,37 @@ class PhoneListController extends AbstractController
      * @param Request $request
      *
      * @return Response
+     *
+     * @throws Exception
      */
     public function getAllPhones(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $phones = $em->getRepository(Phone::class)->findAll();
 
+        $mostRecent = 0;
+        foreach ($phones as $phone) {
+            $date = $phone->getUpdatedAt()->getTimestamp();
+            if ($date > $mostRecent) {
+                $mostRecent = $date;
+            }
+        }
+
+        $lastModified = new DateTime();
+        $lastModified->setTimestamp($mostRecent);
+
         $response = $this->json($phones, Response::HTTP_OK, ['Content-Type' => 'application/json']);
 
-        $response->setEtag(md5($response->getContent()));
-        $response->setPublic(); // make sure the response is public/cacheable
+        $response->setCache([
+            'etag' => md5($response->getContent()),
+            'last_modified' => $lastModified,
+            'max_age' => 15,
+            's_maxage' => 15,
+            'public' => true,
+        ]);
+
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+        $response->expire();
         $response->isNotModified($request);
 
         return $response;
