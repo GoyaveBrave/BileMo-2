@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Phone;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -22,13 +23,21 @@ class PhoneListController extends AbstractController
      * )
      * @SWG\Tag(name="phones")
      *
+     * @param Request $request
+     *
      * @return Response
      */
-    public function getAllPhones()
+    public function getAllPhones(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $phones = $em->getRepository(Phone::class)->findAll();
 
-        return $this->json($phones, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+        $response = $this->json($phones, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+
+        $response->setEtag(md5($response->getContent()));
+        $response->setPublic(); // make sure the response is public/cacheable
+        $response->isNotModified($request);
+
+        return $response;
     }
 }
