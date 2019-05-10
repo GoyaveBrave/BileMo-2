@@ -41,13 +41,20 @@ class PhoneCreationController extends AbstractController
     public function createPhone(Request $request, SerializerInterface $serializer)
     {
         $em = $this->getDoctrine()->getManager();
-        $data = $request->getContent();
-        $phone = $serializer->deserialize($data, Phone::class, 'json');
+        $requestContent = $request->getContent();
+        $phone = $serializer->deserialize($requestContent, Phone::class, 'json');
 
         // TODO: Verification
         $em->persist($phone);
         $em->flush();
 
-        return new Response('', Response::HTTP_CREATED);
+        $data = [
+            'succes' => [
+                'code' => Response::HTTP_CREATED,
+                'message' => 'le portable '.$phone->getName().' a été ajouté.',
+            ],
+        ];
+
+        return $this->json($data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
     }
 }
