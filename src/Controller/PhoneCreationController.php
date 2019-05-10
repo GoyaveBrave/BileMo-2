@@ -16,7 +16,7 @@ class PhoneCreationController extends AbstractController
     /**
      * Create a phone entity.
      *
-     * @Route("/phone/creation", name="phone_creation", methods={"POST"})
+     * @Route("/api/phone/creation", name="phone_creation", methods={"POST"})
      *
      * @SWG\Response(
      *     response=201,

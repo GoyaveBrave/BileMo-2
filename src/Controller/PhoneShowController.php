@@ -17,7 +17,7 @@ class PhoneShowController extends AbstractController
     /**
      * Get a phone by ID.
      *
-     * @Route("/phone/{id}", name="phone_show", methods={"GET"})
+     * @Route("/api/phone/{id}", name="phone_show", methods={"GET"})
      *
      * @SWG\Response(
      *     response=200,

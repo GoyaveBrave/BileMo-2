@@ -17,7 +17,7 @@ class PhoneListController extends AbstractController
     /**
      * Get the list of phones.
      *
-     * @Route("/phone/list", name="phone_list", methods={"GET"})
+     * @Route("/api/phone/list", name="phone_list", methods={"GET"})
      * @SWG\Response(
      *     response=200,
      *     description="Get the list of phones",
