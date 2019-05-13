@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Swagger\Annotations as SWG;
 
 class AuthController extends AbstractController
 {
@@ -24,6 +25,15 @@ class AuthController extends AbstractController
         return new Response(sprintf('User %s successfully created', $user->getUsername()));
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return the login information",
+     *     examples={"Logged in as SFR"},
+     * )
+     *
+     * @SWG\Tag(name="Authentification")
+     */
     public function api()
     {
         return new Response(sprintf('Logged in as %s', $this->getUser()->getUsername()));
