@@ -22,6 +22,7 @@ class PhoneCreationController extends AbstractController
      * @SWG\Response(
      *     response=201,
      *     description="The phone has been created",
+     *     examples={"succes": {"code": 200, "message": "le portable [phone_name] a été ajouté."}},
      * )
      *
      * @SWG\Parameter(

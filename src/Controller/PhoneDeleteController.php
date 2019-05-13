@@ -19,6 +19,7 @@ class PhoneDeleteController extends AbstractController
      * @SWG\Response(
      *     response=200,
      *     description="The phone has been deleted",
+     *     examples={"succes": {"code": 200, "message": "le portable [phone_name] a été supprimé."}},
      * )
      *
      * @SWG\Tag(name="phones")
