@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Phone;
 use DateTime;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +27,7 @@ class PhoneShowController extends AbstractController
      * )
      *
      * @SWG\Tag(name="phones")
+     * @Security(name="Bearer")
      *
      * @param Phone   $phone
      * @param Request $request

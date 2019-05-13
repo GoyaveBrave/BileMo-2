@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Phone;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +33,7 @@ class PhoneCreationController extends AbstractController
      * )
      *
      * @SWG\Tag(name="phones")
+     * @Security(name="Bearer")
      *
      * @param Request             $request
      * @param SerializerInterface $serializer

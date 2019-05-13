@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,7 @@ class PhoneDeleteController extends AbstractController
      * )
      *
      * @SWG\Tag(name="phones")
+     * @Security(name="Bearer")
      *
      * @param Phone $phone
      *
