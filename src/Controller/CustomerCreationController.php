@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
+use App\Entity\Customer;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,28 +12,28 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Swagger\Annotations as SWG;
 
-class PhoneCreationController extends AbstractController
+class CustomerCreationController extends AbstractController
 {
     /**
-     * Create a phone entity.
+     * Create a Customer entity.
      *
-     * @Route("/api/phone/creation", name="phone_creation", methods={"POST"})
+     * @Route("/api/customer/creation", name="customer_creation", methods={"POST"})
      *
      * @SWG\Response(
      *     response=201,
-     *     description="The phone has been created",
-     *     examples={"succes": {"code": 201, "message": "le portable [phone_name] a été ajouté."}},
+     *     description="return a success message",
+     *     examples={"succes": {"code": 201, "message": "l'utilisateur a été ajouté."}},
      * )
      *
      * @SWG\Parameter(
-     *     name="phone",
+     *     name="customer",
      *     in="body",
-     *     description="The information of the phone",
+     *     description="The information of the customer",
      *     type="json",
-     *     @SWG\Schema(ref=@Model(type=Phone::class))
+     *     @SWG\Schema(ref=@Model(type=Customer::class, groups={"insert"}))
      * )
      *
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
      * @param Request             $request
@@ -41,20 +41,23 @@ class PhoneCreationController extends AbstractController
      *
      * @return Response
      */
-    public function createPhone(Request $request, SerializerInterface $serializer)
+    public function createCustomer(Request $request, SerializerInterface $serializer)
     {
         $em = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
-        $phone = $serializer->deserialize($requestContent, Phone::class, 'json');
+
+        /** @var Customer $customer */
+        $customer = $serializer->deserialize($requestContent, Customer::class, 'json');
+        $customer->setUser($this->getUser());
 
         // TODO: Verification
-        $em->persist($phone);
+        $em->persist($customer);
         $em->flush();
 
         $data = [
             'succes' => [
                 'code' => Response::HTTP_CREATED,
-                'message' => 'le portable '.$phone->getName().' a été ajouté.',
+                'message' => "l'utilisateur a été ajouté.",
             ],
         ];
 

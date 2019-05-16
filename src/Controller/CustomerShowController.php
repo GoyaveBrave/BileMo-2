@@ -2,43 +2,47 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
-use DateTime;
+use App\Entity\Customer;
+use App\Entity\User;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Swagger\Annotations as SWG;
 
-class PhoneShowController extends AbstractController
+class CustomerShowController extends AbstractController
 {
     /**
-     * Get a phone by ID.
+     * Get a Customer by ID.
      *
-     * @Route("/api/phone/{id}", name="phone_show", methods={"GET"})
+     * @Route("/api/customer/{id}", name="customer_show", methods={"GET"})
      *
      * @SWG\Response(
      *     response=200,
-     *     description="The requested phone has been found",
-     *     @Model(type=Phone::class)
+     *     description="Return the requested customer",
+     *     @Model(type=Customer::class, groups={"display"})
      * )
      *
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param Phone   $phone
+     * @param int     $id
      * @param Request $request
      *
      * @return JsonResponse
      */
-    public function getPhone(Phone $phone, Request $request)
+    public function getCustomer(int $id, Request $request)
     {
-        $response = $this->json($phone, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+        /** @var User $user */
+        $user = $this->getUser();
 
-        $lastModified = $phone->getUpdatedAt();
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $id]);
+        $response = $this->json($customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
+
+        $lastModified = $customer->getUpdatedAt();
 
         $response->setCache([
             'etag' => md5($response->getContent()),

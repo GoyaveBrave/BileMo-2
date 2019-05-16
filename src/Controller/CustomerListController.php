@@ -2,45 +2,48 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
 use DateTime;
 use Exception;
+use App\Entity\Customer;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 
-class PhoneListController extends AbstractController
+class CustomerListController extends AbstractController
 {
     /**
-     * Get the list of phones.
+     * List customers.
      *
-     * @Route("/api/phone/list", name="phone_list", methods={"GET"})
      * @SWG\Response(
      *     response=200,
-     *     description="Return the list of phones",
-     *     @SWG\Schema(type="array", @Model(type=Phone::class))
+     *     description="Return the list of customers of a user",
+     *     @SWG\Schema(type="array", @SWG\Items(ref=@Model(type=Customer::class, groups={"display"})))
      * )
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
+     *
+     * @Route("/api/customer/list", name="custommer_list", methods={"GET"})
      *
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      *
      * @throws Exception
      */
-    public function getAllPhones(Request $request)
+    public function getCustomersByUser(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $phones = $em->getRepository(Phone::class)->findAll();
-
+        $user = $this->getUser();
+        $customers = $user->getCustomers();
         $mostRecent = 0;
-        foreach ($phones as $phone) {
-            $date = $phone->getUpdatedAt()->getTimestamp();
+
+        /** @var Customer $customer */
+        foreach ($customers as $customer) {
+            $date = $customer->getUpdatedAt()->getTimestamp();
             if ($date > $mostRecent) {
                 $mostRecent = $date;
             }
@@ -49,7 +52,7 @@ class PhoneListController extends AbstractController
         $lastModified = new DateTime();
         $lastModified->setTimestamp($mostRecent);
 
-        $response = $this->json($phones, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+        $response = $this->json($customers, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
 
         $response->setCache([
             'etag' => md5($response->getContent()),

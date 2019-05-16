@@ -2,44 +2,48 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
+use App\Entity\Customer;
+use App\Entity\User;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as SWG;
 
-class PhoneDeleteController extends AbstractController
+class CustomerDeleteController extends AbstractController
 {
     /**
-     * Delete a phone.
+     * Delete a customer.
      *
-     * @Route("/api/phone/delete/{id}", name="phone_delete", methods={"DELETE"})
+     * @Route("/api/customer/delete/{id}", name="customer_delete", methods={"DELETE"})
      *
      * @SWG\Response(
      *     response=200,
      *     description="The phone has been deleted",
-     *     examples={"succes": {"code": 200, "message": "le portable [phone_name] a été supprimé."}},
+     *     examples={"succes": {"code": 200, "message": "l'utilisateur a été supprimé."}},
      * )
      *
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param Phone $phone
-     *
+     * @param int $id
      * @return Response
      */
-    public function deletePhone(Phone $phone)
+    public function deleteCustomer(int $id)
     {
+        /** @var User $user */
+        $user = $this->getUser();
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $id]);
+
         $em = $this->getDoctrine()->getManager();
         // TODO: verification
-        $em->remove($phone);
+        $em->remove($customer);
         $em->flush();
 
         $data = [
             'succes' => [
                 'code' => Response::HTTP_OK,
-                'message' => 'le portable '.$phone->getName().' a été supprimé.',
+                'message' => "l'utilisateur a été supprimé.",
             ],
         ];
 
