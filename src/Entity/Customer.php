@@ -16,24 +16,25 @@ class Customer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"display"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"useful"})
+     * @Groups({"display", "insert"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"useful"})
+     * @Groups({"display", "insert"})
      */
     private $lastname;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"useful"})
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Groups({"display", "insert"})
      */
     private $email;
 

@@ -17,12 +17,12 @@ use Swagger\Annotations as SWG;
 class CustomerListController extends AbstractController
 {
     /**
-     * Liste des utilisateurs d'un client.
+     * List customers.
      *
      * @SWG\Response(
      *     response=200,
      *     description="Return the list of customers of a user",
-     *     @SWG\Schema(type="array", @SWG\Items(ref=@Model(type=Customer::class, groups={"useful"})))
+     *     @SWG\Schema(type="array", @SWG\Items(ref=@Model(type=Customer::class, groups={"display"})))
      * )
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
@@ -52,7 +52,7 @@ class CustomerListController extends AbstractController
         $lastModified = new DateTime();
         $lastModified->setTimestamp($mostRecent);
 
-        $response = $this->json($customers, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'useful']);
+        $response = $this->json($customers, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
 
         $response->setCache([
             'etag' => md5($response->getContent()),

@@ -30,7 +30,7 @@ class CustomerCreationController extends AbstractController
      *     in="body",
      *     description="The information of the customer",
      *     type="json",
-     *     @SWG\Schema(ref=@Model(type=Customer::class, groups={"useful"}))
+     *     @SWG\Schema(ref=@Model(type=Customer::class, groups={"insert"}))
      * )
      *
      * @SWG\Tag(name="Customer")

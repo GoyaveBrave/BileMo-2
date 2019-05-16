@@ -23,7 +23,7 @@ class CustomerShowController extends AbstractController
      * @SWG\Response(
      *     response=200,
      *     description="Return the requested customer",
-     *     @Model(type=Customer::class, groups={"useful"})
+     *     @Model(type=Customer::class, groups={"display"})
      * )
      *
      * @SWG\Tag(name="Customer")
@@ -40,7 +40,7 @@ class CustomerShowController extends AbstractController
         $user = $this->getUser();
 
         $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $id]);
-        $response = $this->json($customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'useful']);
+        $response = $this->json($customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
 
         $lastModified = $customer->getUpdatedAt();
 
