@@ -24,7 +24,7 @@ class PhoneListController extends AbstractController
      *     description="Return the list of phones",
      *     @SWG\Schema(type="array", @Model(type=Phone::class))
      * )
-     * @SWG\Tag(name="phones")
+     * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
      * @param Request $request

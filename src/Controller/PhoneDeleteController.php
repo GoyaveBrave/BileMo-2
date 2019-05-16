@@ -22,7 +22,7 @@ class PhoneDeleteController extends AbstractController
      *     examples={"succes": {"code": 200, "message": "le portable [phone_name] a été supprimé."}},
      * )
      *
-     * @SWG\Tag(name="phones")
+     * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
      * @param Phone $phone

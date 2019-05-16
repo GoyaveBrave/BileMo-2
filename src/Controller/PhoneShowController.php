@@ -26,7 +26,7 @@ class PhoneShowController extends AbstractController
      *     @Model(type=Phone::class)
      * )
      *
-     * @SWG\Tag(name="phones")
+     * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
      * @param Phone   $phone

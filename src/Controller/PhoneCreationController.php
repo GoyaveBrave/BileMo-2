@@ -33,7 +33,7 @@ class PhoneCreationController extends AbstractController
      *     @SWG\Schema(ref=@Model(type=Phone::class))
      * )
      *
-     * @SWG\Tag(name="phones")
+     * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
      * @param Request             $request
