@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Phone;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as SWG;
@@ -25,13 +26,14 @@ class PhoneDeleteController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
-     * @param Phone $phone
+     * @param Request $request
      *
      * @return Response
      */
-    public function deletePhone(Phone $phone)
+    public function deletePhone(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
+        $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
         // TODO: verification
         $em->remove($phone);
         $em->flush();

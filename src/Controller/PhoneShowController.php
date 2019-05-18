@@ -29,13 +29,14 @@ class PhoneShowController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
-     * @param Phone   $phone
      * @param Request $request
      *
      * @return JsonResponse
      */
-    public function getPhone(Phone $phone, Request $request)
+    public function getPhone(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+        $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
         $response = $this->json($phone, Response::HTTP_OK, ['Content-Type' => 'application/json']);
 
         $lastModified = $phone->getUpdatedAt();

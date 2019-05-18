@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use App\Entity\User;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as SWG;
@@ -26,14 +27,14 @@ class CustomerDeleteController extends AbstractController
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param int $id
+     * @param Request $request
      * @return Response
      */
-    public function deleteCustomer(int $id)
+    public function deleteCustomer(Request $request)
     {
         /** @var User $user */
         $user = $this->getUser();
-        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $id]);
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
 
         $em = $this->getDoctrine()->getManager();
         // TODO: verification

@@ -29,17 +29,16 @@ class CustomerShowController extends AbstractController
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param int     $id
      * @param Request $request
      *
      * @return JsonResponse
      */
-    public function getCustomer(int $id, Request $request)
+    public function getCustomer(Request $request)
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $id]);
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
         $response = $this->json($customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
 
         $lastModified = $customer->getUpdatedAt();
