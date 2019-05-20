@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Responder\Interfaces\JsonResponderInterface;
 use DateTime;
 use Exception;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -27,13 +28,14 @@ class PhoneListController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
-     * @param Request $request
+     * @param Request                $request
+     * @param JsonResponderInterface $responder
      *
      * @return Response
      *
      * @throws Exception
      */
-    public function getAllPhones(Request $request)
+    public function getAllPhones(Request $request, JsonResponderInterface $responder)
     {
         $em = $this->getDoctrine()->getManager();
         $phones = $em->getRepository(Phone::class)->findAll();
@@ -49,20 +51,6 @@ class PhoneListController extends AbstractController
         $lastModified = new DateTime();
         $lastModified->setTimestamp($mostRecent);
 
-        $response = $this->json($phones, Response::HTTP_OK, ['Content-Type' => 'application/json']);
-
-        $response->setCache([
-            'etag' => md5($response->getContent()),
-            'last_modified' => $lastModified,
-            'max_age' => 15,
-            's_maxage' => 15,
-            'public' => true,
-        ]);
-
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->expire();
-        $response->isNotModified($request);
-
-        return $response;
+        return $responder($request, $phones, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

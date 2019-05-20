@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Entity\User;
+use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,10 +28,12 @@ class CustomerDeleteController extends AbstractController
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param Request $request
+     * @param Request                $request
+     * @param JsonResponderInterface $responder
+     *
      * @return Response
      */
-    public function deleteCustomer(Request $request)
+    public function deleteCustomer(Request $request, JsonResponderInterface $responder)
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -48,6 +51,6 @@ class CustomerDeleteController extends AbstractController
             ],
         ];
 
-        return $this->json($data, Response::HTTP_OK, ['content-Type' => 'application/json']);
+        return $responder($request, $data, Response::HTTP_OK, ['content-Type' => 'application/json']);
     }
 }
