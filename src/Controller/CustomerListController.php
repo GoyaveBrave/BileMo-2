@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Responder\Interfaces\JsonResponderInterface;
 use DateTime;
 use Exception;
 use App\Entity\Customer;
@@ -29,13 +30,14 @@ class CustomerListController extends AbstractController
      *
      * @Route("/api/customer/list", name="custommer_list", methods={"GET"})
      *
-     * @param Request $request
+     * @param Request                $request
+     * @param JsonResponderInterface $responder
      *
      * @return JsonResponse
      *
      * @throws Exception
      */
-    public function getCustomersByUser(Request $request)
+    public function getCustomersByUser(Request $request, JsonResponderInterface $responder)
     {
         $user = $this->getUser();
         $customers = $user->getCustomers();
@@ -52,19 +54,7 @@ class CustomerListController extends AbstractController
         $lastModified = new DateTime();
         $lastModified->setTimestamp($mostRecent);
 
-        $response = $this->json($customers, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
-
-        $response->setCache([
-            'etag' => md5($response->getContent()),
-            'last_modified' => $lastModified,
-            'max_age' => 15,
-            's_maxage' => 15,
-            'public' => true,
-        ]);
-
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->expire();
-        $response->isNotModified($request);
+        $response = $responder($request, $customers, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
 
         return $response;
     }

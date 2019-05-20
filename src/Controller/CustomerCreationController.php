@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,12 +37,13 @@ class CustomerCreationController extends AbstractController
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param Request             $request
-     * @param SerializerInterface $serializer
+     * @param Request                $request
+     * @param SerializerInterface    $serializer
+     * @param JsonResponderInterface $responder
      *
      * @return Response
      */
-    public function createCustomer(Request $request, SerializerInterface $serializer)
+    public function createCustomer(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder)
     {
         $em = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
@@ -61,6 +63,6 @@ class CustomerCreationController extends AbstractController
             ],
         ];
 
-        return $this->json($data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
+        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
     }
 }

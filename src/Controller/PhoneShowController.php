@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
-use DateTime;
+use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,30 +29,17 @@ class PhoneShowController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
-     * @param Request $request
+     * @param Request                $request
+     * @param JsonResponderInterface $responder
      *
      * @return JsonResponse
      */
-    public function getPhone(Request $request)
+    public function getPhone(Request $request, JsonResponderInterface $responder)
     {
         $em = $this->getDoctrine()->getManager();
         $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
-        $response = $this->json($phone, Response::HTTP_OK, ['Content-Type' => 'application/json']);
-
         $lastModified = $phone->getUpdatedAt();
 
-        $response->setCache([
-            'etag' => md5($response->getContent()),
-            'last_modified' => $lastModified,
-            'max_age' => 15,
-            's_maxage' => 15,
-            'public' => true,
-        ]);
-
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->expire();
-        $response->isNotModified($request);
-
-        return $response;
+        return $responder($request, $phone, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

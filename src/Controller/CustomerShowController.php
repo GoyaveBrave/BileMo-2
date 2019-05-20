@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Entity\User;
+use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,31 +30,20 @@ class CustomerShowController extends AbstractController
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @param Request $request
+     * @param Request                $request
+     * @param JsonResponderInterface $responder
      *
      * @return JsonResponse
      */
-    public function getCustomer(Request $request)
+    public function getCustomer(Request $request, JsonResponderInterface $responder)
     {
         /** @var User $user */
         $user = $this->getUser();
 
         $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
-        $response = $this->json($customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], ['groups' => 'display']);
-
         $lastModified = $customer->getUpdatedAt();
 
-        $response->setCache([
-            'etag' => md5($response->getContent()),
-            'last_modified' => $lastModified,
-            'max_age' => 15,
-            's_maxage' => 15,
-            'public' => true,
-        ]);
-
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->expire();
-        $response->isNotModified($request);
+        $response = $responder($request, $customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
 
         return $response;
     }

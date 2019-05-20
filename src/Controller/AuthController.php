@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Controller;
+
+use App\Responder\Interfaces\JsonResponderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
@@ -10,7 +13,7 @@ use Swagger\Annotations as SWG;
 
 class AuthController extends AbstractController
 {
-    public function register(Request $request, UserPasswordEncoderInterface $encoder)
+    public function register(Request $request, UserPasswordEncoderInterface $encoder, JsonResponderInterface $responder)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -22,20 +25,39 @@ class AuthController extends AbstractController
         $user->setPassword($encoder->encodePassword($user, $password));
         $em->persist($user);
         $em->flush();
-        return new Response(sprintf('User %s successfully created', $user->getUsername()));
+
+        $data = [
+            'succes' => [
+                'code' => Response::HTTP_CREATED,
+                'message' => 'User '.$this->getUser()->getUsername().' successfully created',
+            ],
+        ];
+
+        return $responder($data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
     }
 
     /**
      * @SWG\Response(
      *     response=200,
-     *     description="Return the login information",
-     *     examples={"Logged in as SFR"},
+     *     description="return a success message",
+     *     examples={"succes": {"code": 200, "message": "Logged in as [username]"}},
      * )
      *
      * @SWG\Tag(name="Authentification")
+     *
+     * @param JsonResponderInterface $responder
+     *
+     * @return JsonResponse
      */
-    public function api()
+    public function api(JsonResponderInterface $responder)
     {
-        return new Response(sprintf('Logged in as %s', $this->getUser()->getUsername()));
+        $data = [
+            'succes' => [
+                'code' => Response::HTTP_OK,
+                'message' => 'Logged in as '.$this->getUser()->getUsername(),
+            ],
+        ];
+
+        return $responder($data, Response::HTTP_OK, ['content-Type' => 'application/json']);
     }
 }
