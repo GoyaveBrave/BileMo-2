@@ -24,6 +24,12 @@ class PhoneDeleteController extends AbstractController
      *     examples={"succes": {"code": 200, "message": "le portable [phone_name] a été supprimé."}},
      * )
      *
+     * @SWG\Response(
+     *     response=404,
+     *     description="The phone has been not found",
+     *     examples={"error": {"code": 404, "message": "le portable n'existe pas."}},
+     * )
+     *
      * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
@@ -36,17 +42,32 @@ class PhoneDeleteController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
-        // TODO: verification
-        $em->remove($phone);
-        $em->flush();
 
-        $data = [
-            'succes' => [
-                'code' => Response::HTTP_OK,
-                'message' => 'le portable '.$phone->getName().' a été supprimé.',
-            ],
-        ];
+        if ($phone) {
+            $data = [
+                'succes' => [
+                    'code' => Response::HTTP_OK,
+                    'message' => 'le portable '.$phone->getName().' a été supprimé.',
+                ],
+            ];
 
-        return $responder($request, $data, Response::HTTP_OK, ['content-Type' => 'application/json']);
+            $httpCode = Response::HTTP_OK;
+
+            // TODO: verification
+            $em->remove($phone);
+            $em->flush();
+
+        } else {
+            $data = [
+                'error' => [
+                    'code' => Response::HTTP_NOT_FOUND,
+                    'message' => "le portable n'existe pas.",
+                ],
+            ];
+
+            $httpCode = Response::HTTP_NOT_FOUND;
+        }
+
+        return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
     }
 }

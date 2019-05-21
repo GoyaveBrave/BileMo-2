@@ -26,6 +26,12 @@ class PhoneShowController extends AbstractController
      *     @Model(type=Phone::class)
      * )
      *
+     * @SWG\Response(
+     *     response=404,
+     *     description="The requested phone has been not found",
+     *     examples={"error": {"code": 404, "message": "le portable n'existe pas."}},
+     * )
+     *
      * @SWG\Tag(name="Phone")
      * @Security(name="Bearer")
      *
@@ -38,8 +44,18 @@ class PhoneShowController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
-        $lastModified = $phone->getUpdatedAt();
 
-        return $responder($request, $phone, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
+        if ($phone) {
+            $lastModified = $phone->getUpdatedAt();
+            return $responder($request, $phone, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
+        } else {
+            $data = [
+                'error' => [
+                    'code' => Response::HTTP_NOT_FOUND,
+                    'message' => "le portable n'existe pas.",
+                ],
+            ];
+            return $responder($request, $data, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
+        }
     }
 }

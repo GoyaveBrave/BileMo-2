@@ -21,8 +21,14 @@ class CustomerDeleteController extends AbstractController
      *
      * @SWG\Response(
      *     response=200,
-     *     description="The phone has been deleted",
+     *     description="The customer has been deleted",
      *     examples={"succes": {"code": 200, "message": "l'utilisateur a été supprimé."}},
+     * )
+     *
+     * @SWG\Response(
+     *     response=404,
+     *     description="The customer has been not found",
+     *     examples={"error": {"code": 404, "message": "l'utilisateur n'existe pas."}},
      * )
      *
      * @SWG\Tag(name="Customer")
@@ -37,19 +43,31 @@ class CustomerDeleteController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
-
         $em = $this->getDoctrine()->getManager();
-        // TODO: verification
-        $em->remove($customer);
-        $em->flush();
+        $customer = $em->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
 
-        $data = [
-            'succes' => [
-                'code' => Response::HTTP_OK,
-                'message' => "l'utilisateur a été supprimé.",
-            ],
-        ];
+        if ($customer) {
+            $httpCode = Response::HTTP_OK;
+            $data = [
+                'succes' => [
+                    'code' => $httpCode,
+                    'message' => "l'utilisateur a été supprimé.",
+                ],
+            ];
+
+            // TODO: verification
+            $em->remove($customer);
+            $em->flush();
+
+        } else {
+            $httpCode = Response::HTTP_NOT_FOUND;
+            $data = [
+                'error' => [
+                    'code' => $httpCode,
+                    'message' => "l'utilisateur n'existe pas.",
+                ],
+            ];
+        }
 
         return $responder($request, $data, Response::HTTP_OK, ['content-Type' => 'application/json']);
     }

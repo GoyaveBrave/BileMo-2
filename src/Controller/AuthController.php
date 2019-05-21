@@ -33,7 +33,7 @@ class AuthController extends AbstractController
             ],
         ];
 
-        return $responder($data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
+        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
     }
 
     /**
@@ -47,9 +47,10 @@ class AuthController extends AbstractController
      *
      * @param JsonResponderInterface $responder
      *
+     * @param Request $request
      * @return JsonResponse
      */
-    public function api(JsonResponderInterface $responder)
+    public function api(JsonResponderInterface $responder, Request $request)
     {
         $data = [
             'succes' => [
@@ -58,6 +59,6 @@ class AuthController extends AbstractController
             ],
         ];
 
-        return $responder($data, Response::HTTP_OK, ['content-Type' => 'application/json']);
+        return $responder($request, $data, Response::HTTP_OK, ['content-Type' => 'application/json']);
     }
 }

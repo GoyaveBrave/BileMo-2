@@ -26,6 +26,12 @@ class PhoneCreationController extends AbstractController
      *     examples={"succes": {"code": 201, "message": "le portable [phone_name] a été ajouté."}},
      * )
      *
+     * @SWG\Response(
+     *     response=400,
+     *     description="The phone could not be created",
+     *     examples={"error": {"code": 400, "message": "le portable n'a pas pu être créé."}},
+     * )
+     *
      * @SWG\Parameter(
      *     name="phone",
      *     in="body",
@@ -49,17 +55,30 @@ class PhoneCreationController extends AbstractController
         $requestContent = $request->getContent();
         $phone = $serializer->deserialize($requestContent, Phone::class, 'json');
 
-        // TODO: Verification
-        $em->persist($phone);
-        $em->flush();
+        // TODO: if phone is valid
+        if ($phone) {
+            $em->persist($phone);
+            $em->flush();
 
-        $data = [
-            'succes' => [
-                'code' => Response::HTTP_CREATED,
-                'message' => 'le portable '.$phone->getName().' a été ajouté.',
-            ],
-        ];
+            $httpCode = Response::HTTP_CREATED;
+            $data = [
+                'succes' => [
+                    'code' => $httpCode,
+                    'message' => 'le portable '.$phone->getName().' a été ajouté.',
+                ],
+            ];
+        } else {
+            $httpCode = Response::HTTP_BAD_REQUEST;
+            $data = [
+                'error' => [
+                    'code' => $httpCode,
+                    'message' => "le portable n'a pas pu être créé.",
+                ],
+            ];
 
-        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
+
+        }
+
+        return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
     }
 }

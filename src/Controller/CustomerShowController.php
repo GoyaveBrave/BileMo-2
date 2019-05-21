@@ -27,6 +27,12 @@ class CustomerShowController extends AbstractController
      *     @Model(type=Customer::class, groups={"display"})
      * )
      *
+     * @SWG\Response(
+     *     response=404,
+     *     description="The requested customer has been not found",
+     *     examples={"error": {"code": 404, "message": "l'utilisateur n'existe pas."}},
+     * )
+     *
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
@@ -41,9 +47,19 @@ class CustomerShowController extends AbstractController
         $user = $this->getUser();
 
         $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
-        $lastModified = $customer->getUpdatedAt();
 
-        $response = $responder($request, $customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
+        if ($customer) {
+            $lastModified = $customer->getUpdatedAt();
+            $response = $responder($request, $customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
+        } else {
+            $data = [
+                'error' => [
+                    'code' => Response::HTTP_NOT_FOUND,
+                    'message' => "l'utilisateur n'existe pas.",
+                ],
+            ];
+            return $responder($request, $data, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
+        }
 
         return $response;
     }

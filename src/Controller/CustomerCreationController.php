@@ -26,6 +26,12 @@ class CustomerCreationController extends AbstractController
      *     examples={"succes": {"code": 201, "message": "l'utilisateur a été ajouté."}},
      * )
      *
+     * @SWG\Response(
+     *     response=400,
+     *     description="The user could not be created",
+     *     examples={"error": {"code": 400, "message": "l'utilisateure n'a pas pu être créé."}},
+     * )
+     *
      * @SWG\Parameter(
      *     name="customer",
      *     in="body",
@@ -52,17 +58,28 @@ class CustomerCreationController extends AbstractController
         $customer = $serializer->deserialize($requestContent, Customer::class, 'json');
         $customer->setUser($this->getUser());
 
-        // TODO: Verification
-        $em->persist($customer);
-        $em->flush();
+        // TODO: if customer is valid
+        if ($customer) {
+            $em->persist($customer);
+            $em->flush();
 
-        $data = [
-            'succes' => [
-                'code' => Response::HTTP_CREATED,
-                'message' => "l'utilisateur a été ajouté.",
-            ],
-        ];
+            $httpCode = Response::HTTP_CREATED;
+            $data = [
+                'succes' => [
+                    'code' => $httpCode,
+                    'message' => "l'utilisateur a été ajouté.",
+                ],
+            ];
+        } else {
+            $httpCode = Response::HTTP_BAD_REQUEST;
+            $data = [
+                'error' => [
+                    'code' => $httpCode,
+                    'message' => "l'utilisateur n'a pas pu être créé.",
+                ],
+            ];
+        }
 
-        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
+        return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
     }
 }
