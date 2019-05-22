@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Customer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @method Customer|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,37 +16,44 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class CustomerRepository extends ServiceEntityRepository
 {
+    private $maxResult = 5;
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Customer::class);
     }
 
-    // /**
-    //  * @return Customer[] Returns an array of Customer objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findByPage(int $page, UserInterface $user)
     {
+        $firstResult = ($page - 1) * $this->maxResult;
+
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->setFirstResult($firstResult)
+            ->setMaxResults($this->maxResult)
+            ->orderBy('c.created_at', 'DESC')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Customer
+    /**
+     * @param $user
+     *
+     * @return float|int
+     *
+     * @throws NonUniqueResultException
+     */
+    public function findMaxNumberOfPage(UserInterface $user)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
+        $req = $this->createQueryBuilder('c')
+            ->select('COUNT(c)')
+            ->where('c.user = :user')
+            ->setParameter('user', $user)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getSingleScalarResult();
+
+        return ceil($req / $this->maxResult);
     }
-    */
 }
