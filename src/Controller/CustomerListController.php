@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\CustomerRepository;
 use App\Responder\Interfaces\JsonResponderInterface;
-use DateTime;
+use App\Service\LastModified;
 use Exception;
 use App\Entity\Customer;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -32,29 +33,38 @@ class CustomerListController extends AbstractController
      *
      * @param Request                $request
      * @param JsonResponderInterface $responder
+     * @param CustomerRepository     $customerRepository
      *
      * @return JsonResponse
      *
      * @throws Exception
      */
-    public function getCustomersByUser(Request $request, JsonResponderInterface $responder)
+    public function getCustomersByUser(Request $request, JsonResponderInterface $responder, CustomerRepository $customerRepository)
     {
         $user = $this->getUser();
-        $customers = $user->getCustomers();
-        $mostRecent = 0;
+        $page = $request->get('page') ? $request->get('page') : 1;
+        $totalPage = $customerRepository->findMaxNumberOfPage($user);
+        $customers = $customerRepository->findByPage($page, $user);
 
-        /** @var Customer $customer */
-        foreach ($customers as $customer) {
-            $date = $customer->getUpdatedAt()->getTimestamp();
-            if ($date > $mostRecent) {
-                $mostRecent = $date;
-            }
+        if ($page > $totalPage) {
+            $error = [
+                'error' => [
+                    'code' => Response::HTTP_NOT_FOUND,
+                    'message' => "La page n'existe pas",
+                ],
+            ];
+
+            return $responder($request, $error, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
         }
 
-        $lastModified = new DateTime();
-        $lastModified->setTimestamp($mostRecent);
+        $lastModified = LastModified::getLastModified($customers);
 
-        $response = $responder($request, $customers, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
+        $data = [
+            'page' => $page.'/'.$totalPage,
+            'data' => $customers,
+        ];
+
+        $response = $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
 
         return $response;
     }
