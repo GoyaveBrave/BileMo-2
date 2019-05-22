@@ -23,7 +23,7 @@ class JsonResponder implements JsonResponderInterface
     public function __invoke(Request $request, $data, int $status = 200, array $headers = [], DateTime $lastModified = null, array $context = []): JsonResponse
     {
         $json = $this->serializer->serialize($data, 'json', array_merge([
-            'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
+            'json_encode_options' => JSON_UNESCAPED_SLASHES,
         ], $context));
 
         $response = new JsonResponse($json, $status, $headers, true);

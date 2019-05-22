@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Phone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -14,37 +15,35 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class PhoneRepository extends ServiceEntityRepository
 {
+    private $maxResult = 5;
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Phone::class);
     }
 
-    // /**
-    //  * @return Phone[] Returns an array of Phone objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findByPage(int $page)
     {
+        $firstResult = ($page - 1) * $this->maxResult;
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->setFirstResult($firstResult)
+            ->setMaxResults($this->maxResult)
+            ->orderBy('p.created_at', 'DESC')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Phone
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function findMaxNumberOfPage()
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+        $req = $this->createQueryBuilder('p')
+            ->select('COUNT(p)')
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getSingleScalarResult();
+
+        return ceil($req / $this->maxResult);
     }
-    */
 }
