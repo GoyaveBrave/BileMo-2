@@ -55,7 +55,6 @@ class CustomerDeleteController extends AbstractController
                 ],
             ];
 
-            // TODO: verification
             $em->remove($customer);
             $em->flush();
 
