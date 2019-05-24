@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Loader\PhoneLoader;
 use App\Repository\PhoneRepository;
 use App\Responder\Interfaces\JsonResponderInterface;
 use App\Service\LastModified;
@@ -39,10 +40,9 @@ class PhoneListController extends AbstractController
      *
      * @throws Exception
      */
-    public function getAllPhones(Request $request, JsonResponderInterface $responder, PhoneRepository $phoneRepository)
+    public function getAllPhones(Request $request, JsonResponderInterface $responder, PhoneRepository $phoneRepository, PhoneLoader $phoneLoader)
     {
         $page = $request->get('page') ? $request->get('page') : 1;
-        $phones = $phoneRepository->findByPage($page);
         $totalPage = $phoneRepository->findMaxNumberOfPage();
         $lastModified = null;
 
@@ -56,16 +56,12 @@ class PhoneListController extends AbstractController
             ];
 
         } else {
+            $phones = $phoneLoader->loadAll($page);
             $lastModified = LastModified::getLastModified($phones);
             $httpCode = Response::HTTP_OK;
 
-            $data = [
-                'page' => $page.'/'.$totalPage,
-                'data' => $phones,
-            ];
+            $data = $phones;
         }
-
-
 
         return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
     }
