@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Exceptions\NotFoundException;
 use App\Loader\PhoneLoader;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -41,27 +42,21 @@ class PhoneShowController extends AbstractController
      * @param PhoneLoader            $phoneLoader
      *
      * @return JsonResponse
+     *
+     * @throws NotFoundException
      */
     public function getPhone(Request $request, JsonResponderInterface $responder, PhoneLoader $phoneLoader)
     {
         /** @var Phone $phone */
         $phone = $this->getDoctrine()->getRepository(Phone::class)->find($request->attributes->get('id'));
-        $lastModified = null;
 
-        if ($phone) {
-            $lastModified = $phone->getUpdatedAt();
-            $httpCode = Response::HTTP_OK;
-            $data = $phoneLoader->load($phone);
-        } else {
-            $httpCode = Response::HTTP_NOT_FOUND;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "le portable n'existe pas.",
-                ],
-            ];
+        if (is_null($phone)) {
+            throw new NotFoundException("le portable n'existe pas.");
         }
 
-        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
+        $lastModified = $phone->getUpdatedAt();
+        $data = $phoneLoader->load($phone);
+
+        return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Entity\User;
+use App\Exceptions\NotFoundException;
 use App\Loader\CustomerLoader;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -42,6 +43,8 @@ class CustomerShowController extends AbstractController
      * @param CustomerLoader         $customerLoader
      *
      * @return JsonResponse
+     *
+     * @throws NotFoundException
      */
     public function getCustomer(Request $request, JsonResponderInterface $responder, CustomerLoader $customerLoader)
     {
@@ -49,22 +52,14 @@ class CustomerShowController extends AbstractController
         $user = $this->getUser();
         /** @var Customer $customer */
         $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
-        $lastModified = null;
 
-        if ($customer) {
-            $lastModified = $customer->getUpdatedAt();
-            $httpCode = Response::HTTP_OK;
-            $data = $customerLoader->load($customer);
-        } else {
-            $httpCode = Response::HTTP_NOT_FOUND;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "l'utilisateur n'existe pas.",
-                ],
-            ];
+        if (is_null($customer)) {
+            throw new NotFoundException("l'utilisateur n'existe pas.");
         }
 
-        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
+        $lastModified = $customer->getUpdatedAt();
+        $data = $customerLoader->load($customer);
+
+        return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

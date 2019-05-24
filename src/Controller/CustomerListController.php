@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exceptions\NotFoundException;
 use App\Loader\CustomerLoader;
 use App\Repository\CustomerRepository;
 use App\Responder\Interfaces\JsonResponderInterface;
@@ -40,28 +41,21 @@ class CustomerListController extends AbstractController
      * @return JsonResponse
      *
      * @throws NonUniqueResultException
+     * @throws NotFoundException
      */
     public function getCustomersByUser(Request $request, JsonResponderInterface $responder, CustomerRepository $customerRepository, CustomerLoader $customerLoader)
     {
         $user = $this->getUser();
         $page = $request->get('page') ? $request->get('page') : 1;
         $totalPage = $customerRepository->findMaxNumberOfPage($user);
-        $lastModified = null;
 
-        if ($page > $totalPage) {
-            $httpCode = Response::HTTP_NOT_FOUND;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "La page n'existe pas",
-                ],
-            ];
-        } else {
-            $data = $customerLoader->loadAll($user, $page, $totalPage);
-            $lastModified = LastModified::getLastModified($data);
-            $httpCode = Response::HTTP_OK;
+        if ($page > $totalPage || $page < 0) {
+            throw new NotFoundException("La page n'existe pas");
         }
 
-        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
+        $data = $customerLoader->loadAll($user, $page, $totalPage);
+        $lastModified = LastModified::getLastModified($data);
+
+        return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

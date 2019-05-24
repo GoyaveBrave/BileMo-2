@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Exceptions\NotFoundException;
 use App\Loader\PhoneLoader;
 use App\Repository\PhoneRepository;
 use App\Responder\Interfaces\JsonResponderInterface;
@@ -40,27 +41,20 @@ class PhoneListController extends AbstractController
      * @return Response
      *
      * @throws NonUniqueResultException
+     * @throws NotFoundException
      */
     public function getAllPhones(Request $request, JsonResponderInterface $responder, PhoneRepository $phoneRepository, PhoneLoader $phoneLoader)
     {
         $page = $request->get('page') ? $request->get('page') : 1;
         $totalPage = $phoneRepository->findMaxNumberOfPage();
-        $lastModified = null;
 
-        if ($page > $totalPage) {
-            $httpCode = Response::HTTP_NOT_FOUND;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "La page n'existe pas",
-                ],
-            ];
-        } else {
-            $data = $phoneLoader->loadAll($page, $totalPage);
-            $lastModified = LastModified::getLastModified($data);
-            $httpCode = Response::HTTP_OK;
+        if ($page > $totalPage || $page < 0) {
+            throw new NotFoundException("La page n'existe pas");
         }
 
-        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
+        $data = $phoneLoader->loadAll($page, $totalPage);
+        $lastModified = LastModified::getLastModified($data);
+
+        return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

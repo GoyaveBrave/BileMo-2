@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Entity\User;
+use App\Exceptions\NotFoundException;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,6 +39,8 @@ class CustomerDeleteController extends AbstractController
      * @param JsonResponderInterface $responder
      *
      * @return Response
+     *
+     * @throws NotFoundException
      */
     public function deleteCustomer(Request $request, JsonResponderInterface $responder)
     {
@@ -46,27 +49,20 @@ class CustomerDeleteController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $customer = $em->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
 
-        if ($customer) {
-            $httpCode = Response::HTTP_OK;
-            $data = [
-                'succes' => [
-                    'code' => $httpCode,
-                    'message' => "l'utilisateur a été supprimé.",
-                ],
-            ];
-
-            $em->remove($customer);
-            $em->flush();
-
-        } else {
-            $httpCode = Response::HTTP_NOT_FOUND;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "l'utilisateur n'existe pas.",
-                ],
-            ];
+        if (is_null($customer)) {
+            throw new NotFoundException("l'utilisateur n'existe pas.");
         }
+
+        $httpCode = Response::HTTP_OK;
+        $data = [
+            'succes' => [
+                'code' => $httpCode,
+                'message' => "l'utilisateur a été supprimé.",
+            ],
+        ];
+
+        $em->remove($customer);
+        $em->flush();
 
         return $responder($request, $data, Response::HTTP_OK, ['content-Type' => 'application/json']);
     }

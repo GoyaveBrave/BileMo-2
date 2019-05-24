@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Exceptions\NotFoundException;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,35 +38,28 @@ class PhoneDeleteController extends AbstractController
      * @param JsonResponderInterface $responder
      *
      * @return Response
+     *
+     * @throws NotFoundException
      */
     public function deletePhone(Request $request, JsonResponderInterface $responder)
     {
         $em = $this->getDoctrine()->getManager();
         $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
 
-        if ($phone) {
-            $data = [
-                'succes' => [
-                    'code' => Response::HTTP_OK,
-                    'message' => 'le portable '.$phone->getName().' a été supprimé.',
-                ],
-            ];
-
-            $httpCode = Response::HTTP_OK;
-
-            $em->remove($phone);
-            $em->flush();
-
-        } else {
-            $data = [
-                'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
-                    'message' => "le portable n'existe pas.",
-                ],
-            ];
-
-            $httpCode = Response::HTTP_NOT_FOUND;
+        if (is_null($phone)) {
+            throw new NotFoundException("le portable n'existe pas.");
         }
+
+        $httpCode = Response::HTTP_OK;
+        $data = [
+            'succes' => [
+                'code' => $httpCode,
+                'message' => 'le portable '.$phone->getName().' a été supprimé.',
+            ],
+        ];
+
+        $em->remove($phone);
+        $em->flush();
 
         return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
     }
