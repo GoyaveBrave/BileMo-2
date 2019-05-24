@@ -192,4 +192,19 @@ class Phone
 
         return $this;
     }
+
+    public function getAttributes(): array
+    {
+        return $attributes = [
+            'name' => $this->name,
+            'camera' => $this->camera,
+            'battery' => $this->battery,
+            'screen' => $this->screen,
+            'ram' => $this->ram,
+            'memory' => $this->memory,
+            'price' => $this->price,
+            'created_at' => $this->getCreatedAt()->format('D, d M Y H:i:s'),
+            'updated_at' => $this->getUpdatedAt()->format('D, d M Y H:i:s'),
+        ];
+    }
 }
