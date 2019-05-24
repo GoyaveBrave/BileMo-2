@@ -1,0 +1,21 @@
+App\Entity\Customer:
+  constraints:
+    - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: email
+  properties:
+    firstname:
+      - NotBlank: ~
+      - Length:
+          min: 2
+          max: 50
+          minMessage: 'Your first name must be at least {{ limit }} characters long'
+          maxMessage: 'Your first name cannot be longer than {{ limit }} characters'
+    lastname:
+      - NotBlank: ~
+      - Length:
+          min: 2
+          max: 50
+          minMessage: 'Your last name must be at least {{ limit }} characters long'
+          maxMessage: 'Your last name cannot be longer than {{ limit }} characters'
+    email:
+      - Email:
+          message: 'The email "{{ value }}" is not a valid email.'

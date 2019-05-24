@@ -1,0 +1,58 @@
+App\Entity\Phone:
+  properties:
+    name:
+      - NotBlank: ~
+      - Type:
+          type: string
+          message: The value {{ value }} is not a valid {{ type }}.
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The name must be at least {{ limit }} characters long'
+          maxMessage: 'The name cannot be longer than {{ limit }} characters'
+    camera:
+      - Type:
+          type: string
+          message: The value {{ value }} is not a valid {{ type }}.
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The camera must be at least {{ limit }} characters long'
+          maxMessage: 'The camera cannot be longer than {{ limit }} characters'
+    battery:
+      - Type:
+          type: integer
+          message: The value {{ value }} is not a valid {{ type }}.
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The battery capacity must be at least {{ limit }} characters long'
+          maxMessage: 'The battery capacity cannot be longer than {{ limit }} characters'
+    screen:
+      - Type:
+          type: string
+          message: The value {{ value }} is not a valid {{ type }}.
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The screen name must be at least {{ limit }} characters long'
+          maxMessage: 'The screen name cannot be longer than {{ limit }} characters'
+    ram:
+      - Type:
+          type: integer
+          message: The value {{ value }} is not a valid {{ type }}.
+      - Length:
+          max: 2
+          maxMessage: 'The ram capacity cannot be longer than {{ limit }} characters'
+    memory:
+      - Type:
+          type: integer
+          message: The value {{ value }} is not a valid {{ type }}.
+      - Length:
+          max: 3
+          maxMessage: 'The memory capacity cannot be longer than {{ limit }} characters'
+    price:
+      - NotBlank: ~
+      - Type:
+          type: integer
+          message: The value {{ value }} is not a valid {{ type }}.

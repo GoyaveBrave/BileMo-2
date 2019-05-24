@@ -1,0 +1,11 @@
+App\Entity\User:
+  constraints:
+    - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: username
+  properties:
+    username:
+      - NotBlank: ~
+      - Length:
+          min: 2
+          max: 180
+          minMessage: 'Your user name must be at least {{ limit }} characters long'
+          maxMessage: 'Your user name cannot be longer than {{ limit }} characters'
