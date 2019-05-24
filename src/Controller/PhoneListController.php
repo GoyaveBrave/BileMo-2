@@ -7,7 +7,7 @@ use App\Loader\PhoneLoader;
 use App\Repository\PhoneRepository;
 use App\Responder\Interfaces\JsonResponderInterface;
 use App\Service\LastModified;
-use Exception;
+use Doctrine\ORM\NonUniqueResultException;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,10 +35,11 @@ class PhoneListController extends AbstractController
      * @param Request                $request
      * @param JsonResponderInterface $responder
      * @param PhoneRepository        $phoneRepository
+     * @param PhoneLoader            $phoneLoader
      *
      * @return Response
      *
-     * @throws Exception
+     * @throws NonUniqueResultException
      */
     public function getAllPhones(Request $request, JsonResponderInterface $responder, PhoneRepository $phoneRepository, PhoneLoader $phoneLoader)
     {
@@ -54,7 +55,6 @@ class PhoneListController extends AbstractController
                     'message' => "La page n'existe pas",
                 ],
             ];
-
         } else {
             $data = $phoneLoader->loadAll($page, $totalPage);
             $lastModified = LastModified::getLastModified($data);
