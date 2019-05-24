@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PhoneCreationController extends AbstractController
 {
@@ -46,17 +47,21 @@ class PhoneCreationController extends AbstractController
      * @param Request                $request
      * @param SerializerInterface    $serializer
      * @param JsonResponderInterface $responder
+     * @param ValidatorInterface     $validator
      *
      * @return Response
      */
-    public function createPhone(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder)
+    public function createPhone(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
         $em = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
         $phone = $serializer->deserialize($requestContent, Phone::class, 'json');
+        $errors = $validator->validate($phone);
 
-        // TODO: if phone is valid
-        if ($phone) {
+        if (count($errors)) {
+            $httpCode = Response::HTTP_BAD_REQUEST;
+            $data = ['error' => $errors];
+        } else {
             $em->persist($phone);
             $em->flush();
 
@@ -67,16 +72,6 @@ class PhoneCreationController extends AbstractController
                     'message' => 'le portable '.$phone->getName().' a été ajouté.',
                 ],
             ];
-        } else {
-            $httpCode = Response::HTTP_BAD_REQUEST;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "le portable n'a pas pu être créé.",
-                ],
-            ];
-
-
         }
 
         return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
