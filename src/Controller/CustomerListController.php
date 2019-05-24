@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\Loader\CustomerLoader;
 use App\Repository\CustomerRepository;
 use App\Responder\Interfaces\JsonResponderInterface;
 use App\Service\LastModified;
-use Exception;
 use App\Entity\Customer;
+use Doctrine\ORM\NonUniqueResultException;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,24 +30,23 @@ class CustomerListController extends AbstractController
      * @SWG\Tag(name="Customer")
      * @Security(name="Bearer")
      *
-     * @Route("/api/customer/list", name="custommer_list", methods={"GET"})
+     * @Route("/api/customer/list", name="customer_list", methods={"GET"})
      *
      * @param Request                $request
      * @param JsonResponderInterface $responder
      * @param CustomerRepository     $customerRepository
+     * @param CustomerLoader         $customerLoader
      *
      * @return JsonResponse
      *
-     * @throws Exception
+     * @throws NonUniqueResultException
      */
-    public function getCustomersByUser(Request $request, JsonResponderInterface $responder, CustomerRepository $customerRepository)
+    public function getCustomersByUser(Request $request, JsonResponderInterface $responder, CustomerRepository $customerRepository, CustomerLoader $customerLoader)
     {
         $user = $this->getUser();
         $page = $request->get('page') ? $request->get('page') : 1;
         $totalPage = $customerRepository->findMaxNumberOfPage($user);
-        $customers = $customerRepository->findByPage($page, $user);
         $lastModified = null;
-        $context = [];
 
         if ($page > $totalPage) {
             $httpCode = Response::HTTP_NOT_FOUND;
@@ -57,15 +57,11 @@ class CustomerListController extends AbstractController
                 ],
             ];
         } else {
-            $lastModified = LastModified::getLastModified($customers);
-            $context = ['groups' => 'display'];
+            $data = $customerLoader->loadAll($user, $page, $totalPage);
+            $lastModified = LastModified::getLastModified($data);
             $httpCode = Response::HTTP_OK;
-            $data = [
-                'page' => $page.'/'.$totalPage,
-                'data' => $customers,
-            ];
         }
 
-        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified, $context);
+        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

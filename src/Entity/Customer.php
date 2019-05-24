@@ -147,4 +147,15 @@ class Customer
 
         return $this;
     }
+
+    public function getAttributes(): array
+    {
+        return $attributes = [
+            'first_name' => $this->firstname,
+            'last_name' => $this->lastname,
+            'email' => $this->email,
+            'created_at' => $this->getCreatedAt()->format('D, d M Y H:i:s'),
+            'updated_at' => $this->getUpdatedAt()->format('D, d M Y H:i:s'),
+        ];
+    }
 }

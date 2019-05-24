@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Entity\User;
+use App\Loader\CustomerLoader;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -38,21 +39,22 @@ class CustomerShowController extends AbstractController
      *
      * @param Request                $request
      * @param JsonResponderInterface $responder
+     * @param CustomerLoader         $customerLoader
      *
      * @return JsonResponse
      */
-    public function getCustomer(Request $request, JsonResponderInterface $responder)
+    public function getCustomer(Request $request, JsonResponderInterface $responder, CustomerLoader $customerLoader)
     {
         /** @var User $user */
         $user = $this->getUser();
-        $data = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
+        /** @var Customer $customer */
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
         $lastModified = null;
-        $context = [];
 
-        if ($data) {
-            $lastModified = $data->getUpdatedAt();
-            $context = ['groups' => 'display'];
+        if ($customer) {
+            $lastModified = $customer->getUpdatedAt();
             $httpCode = Response::HTTP_OK;
+            $data = $customerLoader->load($customer);
         } else {
             $httpCode = Response::HTTP_NOT_FOUND;
             $data = [
@@ -63,6 +65,6 @@ class CustomerShowController extends AbstractController
             ];
         }
 
-        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified, $context);
+        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
     }
 }
