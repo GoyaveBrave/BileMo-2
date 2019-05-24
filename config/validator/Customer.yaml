@@ -17,5 +17,6 @@ App\Entity\Customer:
           minMessage: 'Your last name must be at least {{ limit }} characters long'
           maxMessage: 'Your last name cannot be longer than {{ limit }} characters'
     email:
+      - NotBlank: ~
       - Email:
           message: 'The email "{{ value }}" is not a valid email.'
