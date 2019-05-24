@@ -4,7 +4,6 @@ namespace App\Loader;
 
 use App\Output\PhonesOutput;
 use App\Repository\PhoneRepository;
-use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PhoneLoader
@@ -32,16 +31,12 @@ class PhoneLoader
 
     /**
      * @param $page
+     * @param $totalPage
      *
      * @return PhonesOutput|void
-     *
-     * @throws NonUniqueResultException
      */
-    public function loadAll($page): PhonesOutput
+    public function loadAll($page, $totalPage): PhonesOutput
     {
-        $totalPage = $this->phoneRepository->findMaxNumberOfPage();
-        $lastModified = null;
-
         $phones = $this->phoneRepository->findByPage($page);
         $phonesOutput = new PhonesOutput($phones, $this->urlGenerator, $page, $totalPage);
 

@@ -56,11 +56,9 @@ class PhoneListController extends AbstractController
             ];
 
         } else {
-            $phones = $phoneLoader->loadAll($page);
-            $lastModified = LastModified::getLastModified($phones);
+            $data = $phoneLoader->loadAll($page, $totalPage);
+            $lastModified = LastModified::getLastModified($data);
             $httpCode = Response::HTTP_OK;
-
-            $data = $phones;
         }
 
         return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
