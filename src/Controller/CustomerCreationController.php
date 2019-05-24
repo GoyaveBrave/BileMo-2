@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomerCreationController extends AbstractController
 {
@@ -46,10 +47,11 @@ class CustomerCreationController extends AbstractController
      * @param Request                $request
      * @param SerializerInterface    $serializer
      * @param JsonResponderInterface $responder
+     * @param ValidatorInterface     $validator
      *
      * @return Response
      */
-    public function createCustomer(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder)
+    public function createCustomer(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
         $em = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
@@ -58,8 +60,12 @@ class CustomerCreationController extends AbstractController
         $customer = $serializer->deserialize($requestContent, Customer::class, 'json');
         $customer->setUser($this->getUser());
 
-        // TODO: if customer is valid
-        if ($customer) {
+        $errors = $validator->validate($customer);
+
+        if (count($errors)) {
+            $httpCode = Response::HTTP_BAD_REQUEST;
+            $data = ['error' => $errors];
+        } else {
             $em->persist($customer);
             $em->flush();
 
@@ -68,14 +74,6 @@ class CustomerCreationController extends AbstractController
                 'succes' => [
                     'code' => $httpCode,
                     'message' => "l'utilisateur a été ajouté.",
-                ],
-            ];
-        } else {
-            $httpCode = Response::HTTP_BAD_REQUEST;
-            $data = [
-                'error' => [
-                    'code' => $httpCode,
-                    'message' => "l'utilisateur n'a pas pu être créé.",
                 ],
             ];
         }

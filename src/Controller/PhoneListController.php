@@ -44,25 +44,29 @@ class PhoneListController extends AbstractController
         $page = $request->get('page') ? $request->get('page') : 1;
         $phones = $phoneRepository->findByPage($page);
         $totalPage = $phoneRepository->findMaxNumberOfPage();
+        $lastModified = null;
 
         if ($page > $totalPage) {
-            $error = [
+            $httpCode = Response::HTTP_NOT_FOUND;
+            $data = [
                 'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
+                    'code' => $httpCode,
                     'message' => "La page n'existe pas",
                 ],
             ];
 
-            return $responder($request, $error, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
+        } else {
+            $lastModified = LastModified::getLastModified($phones);
+            $httpCode = Response::HTTP_OK;
+
+            $data = [
+                'page' => $page.'/'.$totalPage,
+                'data' => $phones,
+            ];
         }
 
-        $lastModified = LastModified::getLastModified($phones);
 
-        $data = [
-            'page' => $page.'/'.$totalPage,
-            'data' => $phones,
-        ];
 
-        return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
+        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
     }
 }

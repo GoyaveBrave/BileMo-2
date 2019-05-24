@@ -45,27 +45,27 @@ class CustomerListController extends AbstractController
         $page = $request->get('page') ? $request->get('page') : 1;
         $totalPage = $customerRepository->findMaxNumberOfPage($user);
         $customers = $customerRepository->findByPage($page, $user);
+        $lastModified = null;
+        $context = [];
 
         if ($page > $totalPage) {
-            $error = [
+            $httpCode = Response::HTTP_NOT_FOUND;
+            $data = [
                 'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
+                    'code' => $httpCode,
                     'message' => "La page n'existe pas",
                 ],
             ];
-
-            return $responder($request, $error, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
+        } else {
+            $lastModified = LastModified::getLastModified($customers);
+            $context = ['groups' => 'display'];
+            $httpCode = Response::HTTP_OK;
+            $data = [
+                'page' => $page.'/'.$totalPage,
+                'data' => $customers,
+            ];
         }
 
-        $lastModified = LastModified::getLastModified($customers);
-
-        $data = [
-            'page' => $page.'/'.$totalPage,
-            'data' => $customers,
-        ];
-
-        $response = $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
-
-        return $response;
+        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified, $context);
     }
 }

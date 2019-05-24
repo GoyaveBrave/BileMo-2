@@ -45,22 +45,24 @@ class CustomerShowController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
+        $data = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
+        $lastModified = null;
+        $context = [];
 
-        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
-
-        if ($customer) {
-            $lastModified = $customer->getUpdatedAt();
-            $response = $responder($request, $customer, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified, ['groups' => 'display']);
+        if ($data) {
+            $lastModified = $data->getUpdatedAt();
+            $context = ['groups' => 'display'];
+            $httpCode = Response::HTTP_OK;
         } else {
+            $httpCode = Response::HTTP_NOT_FOUND;
             $data = [
                 'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
+                    'code' => $httpCode,
                     'message' => "l'utilisateur n'existe pas.",
                 ],
             ];
-            return $responder($request, $data, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
         }
 
-        return $response;
+        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified, $context);
     }
 }

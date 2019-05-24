@@ -53,7 +53,6 @@ class PhoneDeleteController extends AbstractController
 
             $httpCode = Response::HTTP_OK;
 
-            // TODO: verification
             $em->remove($phone);
             $em->flush();
 

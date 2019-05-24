@@ -43,19 +43,22 @@ class PhoneShowController extends AbstractController
     public function getPhone(Request $request, JsonResponderInterface $responder)
     {
         $em = $this->getDoctrine()->getManager();
-        $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
+        $data = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
+        $lastModified = null;
 
-        if ($phone) {
-            $lastModified = $phone->getUpdatedAt();
-            return $responder($request, $phone, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
+        if ($data) {
+            $lastModified = $data->getUpdatedAt();
+            $httpCode = Response::HTTP_OK;
         } else {
+            $httpCode = Response::HTTP_NOT_FOUND;
             $data = [
                 'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
+                    'code' => $httpCode,
                     'message' => "le portable n'existe pas.",
                 ],
             ];
-            return $responder($request, $data, Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
         }
+
+        return $responder($request, $data, $httpCode, ['Content-Type' => 'application/json'], $lastModified);
     }
 }
