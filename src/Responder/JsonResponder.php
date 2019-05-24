@@ -14,6 +14,7 @@ class JsonResponder implements JsonResponderInterface
      * @var SerializerInterface
      */
     private $serializer;
+    const CONTENT_TYPE_JSON = ['Content-Type' => 'application/json'];
 
     public function __construct(SerializerInterface $serializer)
     {
@@ -28,7 +29,7 @@ class JsonResponder implements JsonResponderInterface
 
         $response = new JsonResponse($json, $status, $headers, true);
 
-        if ('GET' == $request->getMethod()) {
+        if ($request->isMethodCacheable()) {
             $response->setCache([
                 'etag' => md5($response->getContent()),
                 'max_age' => 15,
@@ -40,11 +41,9 @@ class JsonResponder implements JsonResponderInterface
                 $response->setLastModified($lastModified);
             }
 
-            if ($response->isCacheable()) {
-                $response->headers->addCacheControlDirective('must-revalidate', true);
-                $response->expire();
-                $response->isNotModified($request);
-            }
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+            $response->expire();
+            $response->isNotModified($request);
         }
 
         return $response;

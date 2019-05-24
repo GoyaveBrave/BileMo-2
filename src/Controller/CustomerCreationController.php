@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use App\Exceptions\BadRequestException;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -50,6 +51,8 @@ class CustomerCreationController extends AbstractController
      * @param ValidatorInterface     $validator
      *
      * @return Response
+     *
+     * @throws BadRequestException
      */
     public function createCustomer(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
@@ -63,21 +66,21 @@ class CustomerCreationController extends AbstractController
         $errors = $validator->validate($customer);
 
         if (count($errors)) {
-            $httpCode = Response::HTTP_BAD_REQUEST;
-            $data = ['error' => $errors];
-        } else {
-            $em->persist($customer);
-            $em->flush();
-
-            $httpCode = Response::HTTP_CREATED;
-            $data = [
-                'succes' => [
-                    'code' => $httpCode,
-                    'message' => "l'utilisateur a été ajouté.",
-                ],
-            ];
+            $errorsWithNoReturn = preg_replace('~[\r\n]+~', '', (string) $errors);
+            $errorsMessage = preg_replace('/\s+/', ' ', $errorsWithNoReturn);
+            throw new BadRequestException($errorsMessage);
         }
 
-        return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
+        $em->persist($customer);
+        $em->flush();
+
+        $data = [
+            'succes' => [
+                'code' => Response::HTTP_CREATED,
+                'message' => "l'utilisateur a été ajouté.",
+            ],
+        ];
+
+        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
     }
 }

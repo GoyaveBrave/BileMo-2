@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Exceptions\BadRequestException;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -50,6 +51,8 @@ class PhoneCreationController extends AbstractController
      * @param ValidatorInterface     $validator
      *
      * @return Response
+     *
+     * @throws BadRequestException
      */
     public function createPhone(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
@@ -59,21 +62,22 @@ class PhoneCreationController extends AbstractController
         $errors = $validator->validate($phone);
 
         if (count($errors)) {
-            $httpCode = Response::HTTP_BAD_REQUEST;
-            $data = ['error' => $errors];
-        } else {
-            $em->persist($phone);
-            $em->flush();
+            $errorsWithNoReturn = preg_replace('~[\r\n]+~', '', (string) $errors);
+            $errorsMessage = preg_replace('/\s+/', ' ', $errorsWithNoReturn);
+            throw new BadRequestException($errorsMessage);
 
-            $httpCode = Response::HTTP_CREATED;
-            $data = [
-                'succes' => [
-                    'code' => $httpCode,
-                    'message' => 'le portable '.$phone->getName().' a été ajouté.',
-                ],
-            ];
         }
 
-        return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
+        $em->persist($phone);
+        $em->flush();
+
+        $data = [
+            'succes' => [
+                'code' => Response::HTTP_CREATED,
+                'message' => 'le portable '.$phone->getName().' a été ajouté.',
+            ],
+        ];
+
+        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
     }
 }
