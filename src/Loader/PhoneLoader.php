@@ -2,6 +2,8 @@
 
 namespace App\Loader;
 
+use App\Entity\Phone;
+use App\Output\PhoneOutput;
 use App\Output\PhonesOutput;
 use App\Repository\PhoneRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -41,5 +43,12 @@ class PhoneLoader
         $phonesOutput = new PhonesOutput($phones, $this->urlGenerator, $page, $totalPage);
 
         return $phonesOutput;
+    }
+
+    public function load(Phone $phone)
+    {
+        $phoneOutput = new PhoneOutput($phone, $this->urlGenerator);
+
+        return $phoneOutput;
     }
 }

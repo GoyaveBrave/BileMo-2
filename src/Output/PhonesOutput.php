@@ -22,7 +22,10 @@ class PhonesOutput implements PhonesOutputInterface
      */
     public function __construct(array $phones, UrlGeneratorInterface $urlGenerator, $page = null, $totalPage = null)
     {
-        $this->links = ['self' => $urlGenerator->generate('phone_list', [], 0)];
+        $this->links = [
+            'self' => $urlGenerator->generate('phone_list', [], 0),
+            'create' => $urlGenerator->generate('phone_creation', [], 0),
+        ];
         if ($page && $totalPage) {
             $this->page = $page.'/'.$totalPage;
         }

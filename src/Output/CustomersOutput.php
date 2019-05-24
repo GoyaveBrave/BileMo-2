@@ -22,7 +22,11 @@ class CustomersOutput implements CustomersOutputInterface
      */
     public function __construct(array $customers, UrlGeneratorInterface $urlGenerator, $page = null, $totalPage = null)
     {
-        $this->links = ['self' => $urlGenerator->generate('customer_list', [], 0)];
+        $this->links = [
+            'self' => $urlGenerator->generate('customer_list', [], 0),
+            'create' => $urlGenerator->generate('customer_creation', [], 0),
+        ];
+
         if ($page && $totalPage) {
             $this->page = $page.'/'.$totalPage;
         }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Loader\PhoneLoader;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,18 +38,20 @@ class PhoneShowController extends AbstractController
      *
      * @param Request                $request
      * @param JsonResponderInterface $responder
+     * @param PhoneLoader            $phoneLoader
      *
      * @return JsonResponse
      */
-    public function getPhone(Request $request, JsonResponderInterface $responder)
+    public function getPhone(Request $request, JsonResponderInterface $responder, PhoneLoader $phoneLoader)
     {
-        $em = $this->getDoctrine()->getManager();
-        $data = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
+        /** @var Phone $phone */
+        $phone = $this->getDoctrine()->getRepository(Phone::class)->find($request->attributes->get('id'));
         $lastModified = null;
 
-        if ($data) {
-            $lastModified = $data->getUpdatedAt();
+        if ($phone) {
+            $lastModified = $phone->getUpdatedAt();
             $httpCode = Response::HTTP_OK;
+            $data = $phoneLoader->load($phone);
         } else {
             $httpCode = Response::HTTP_NOT_FOUND;
             $data = [

@@ -2,6 +2,8 @@
 
 namespace App\Loader;
 
+use App\Entity\Customer;
+use App\Output\CustomerOutput;
 use App\Output\CustomersOutput;
 use App\Repository\CustomerRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -42,5 +44,12 @@ class CustomerLoader
         $customersOutput = new CustomersOutput($customers, $this->urlGenerator, $page, $totalPage);
 
         return $customersOutput;
+    }
+
+    public function load(Customer $customer)
+    {
+        $customerOutput = new CustomerOutput($customer, $this->urlGenerator);
+
+        return $customerOutput;
     }
 }
