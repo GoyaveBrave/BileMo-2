@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\PhoneDTO;
 use App\Entity\Phone;
 use App\Exceptions\BadRequestException;
 use App\Responder\Interfaces\JsonResponderInterface;
@@ -58,7 +59,17 @@ class PhoneCreationController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
-        $phone = $serializer->deserialize($requestContent, Phone::class, 'json');
+        /** @var PhoneDTO $phoneDTO */
+        $phoneDTO = $serializer->deserialize($requestContent, PhoneDTO::class, 'json');
+        $phone = new Phone(
+            $phoneDTO->getName(),
+            $phoneDTO->getPrice(),
+            $phoneDTO->getCamera(),
+            $phoneDTO->getBattery(),
+            $phoneDTO->getScreen(),
+            $phoneDTO->getRam(),
+            $phoneDTO->getMemory()
+        );
         $errors = $validator->validate($phone);
 
         if (count($errors)) {

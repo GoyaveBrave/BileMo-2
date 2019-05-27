@@ -16,9 +16,7 @@ class PhoneFixture extends Fixture
     public function load(ObjectManager $manager)
     {
         for ($i = 0; $i < 20; ++$i) {
-            $phone = new Phone();
-            $phone->setName('phone '.$i);
-            $phone->setPrice(mt_rand(50, 800));
+            $phone = new Phone('phone '.$i, mt_rand(50, 800));
             $manager->persist($phone);
         }
 

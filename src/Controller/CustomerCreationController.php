@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\CustomerDTO;
 use App\Entity\Customer;
 use App\Exceptions\BadRequestException;
 use App\Responder\Interfaces\JsonResponderInterface;
@@ -59,9 +60,14 @@ class CustomerCreationController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
 
-        /** @var Customer $customer */
-        $customer = $serializer->deserialize($requestContent, Customer::class, 'json');
-        $customer->setUser($this->getUser());
+        /** @var CustomerDTO $customerDTO */
+        $customerDTO = $serializer->deserialize($requestContent, CustomerDTO::class, 'json');
+        $customer = new Customer(
+            $customerDTO->getFirstname(),
+            $customerDTO->getLastname(),
+            $customerDTO->getEmail(),
+            $this->getUser()
+        );
 
         $errors = $validator->validate($customer);
 
