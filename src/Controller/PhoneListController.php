@@ -46,13 +46,14 @@ class PhoneListController extends AbstractController
     public function getAllPhones(Request $request, JsonResponderInterface $responder, PhoneRepository $phoneRepository, PhoneLoader $phoneLoader)
     {
         $page = $request->get('page') ? $request->get('page') : 1;
-        $totalPage = $phoneRepository->findMaxNumberOfPage();
+        $maxResult = $request->get('results') ? $request->get('results') : 5;
+        $totalPage = $phoneRepository->findMaxNumberOfPage($maxResult);
 
         if ($page > $totalPage || $page < 0) {
             throw new NotFoundException("La page n'existe pas");
         }
 
-        $data = $phoneLoader->loadAll($page, $totalPage);
+        $data = $phoneLoader->loadAll($page, $totalPage, $maxResult);
         $lastModified = LastModified::getLastModified($data);
 
         return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);
