@@ -84,13 +84,12 @@ class Phone
         $this->price = $price;
     }
 
-
     /**
      * @ORM\PrePersist
      */
     public function onAdd()
     {
-        $this->setCreatedAt(new DateTime());
+        $this->created_at = new DateTime();
     }
 
     /**
@@ -99,7 +98,7 @@ class Phone
      */
     public function onUpdate()
     {
-        $this->setUpdatedAt(new DateTime());
+        $this->updated_at = new DateTime();
     }
 
     public function getId(): ?int
@@ -112,107 +111,14 @@ class Phone
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getCamera(): ?string
-    {
-        return $this->camera;
-    }
-
-    public function setCamera(?string $camera): self
-    {
-        $this->camera = $camera;
-
-        return $this;
-    }
-
-    public function getBattery(): ?string
-    {
-        return $this->battery;
-    }
-
-    public function setBattery(?string $battery): self
-    {
-        $this->battery = $battery;
-
-        return $this;
-    }
-
-    public function getScreen(): ?string
-    {
-        return $this->screen;
-    }
-
-    public function setScreen(?string $screen): self
-    {
-        $this->screen = $screen;
-
-        return $this;
-    }
-
-    public function getRam(): ?string
-    {
-        return $this->ram;
-    }
-
-    public function setRam(?string $ram): self
-    {
-        $this->ram = $ram;
-
-        return $this;
-    }
-
-    public function getMemory(): ?string
-    {
-        return $this->memory;
-    }
-
-    public function setMemory(?string $memory): self
-    {
-        $this->memory = $memory;
-
-        return $this;
-    }
-
-    public function getPrice(): ?int
-    {
-        return $this->price;
-    }
-
-    public function setPrice(int $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updated_at;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
     }
 
     public function getAttributes(): array
