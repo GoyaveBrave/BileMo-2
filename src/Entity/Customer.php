@@ -55,6 +55,21 @@ class Customer
     private $updated_at;
 
     /**
+     * Customer constructor.
+     * @param $firstname
+     * @param $lastname
+     * @param $email
+     * @param $user
+     */
+    public function __construct($firstname, $lastname, $email, $user)
+    {
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->email = $email;
+        $this->user = $user;
+    }
+
+    /**
      * @ORM\PrePersist
      */
     public function onAdd()

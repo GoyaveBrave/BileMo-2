@@ -64,6 +64,28 @@ class Phone
     private $updated_at;
 
     /**
+     * Phone constructor.
+     * @param $name
+     * @param $camera
+     * @param $battery
+     * @param $screen
+     * @param $ram
+     * @param $memory
+     * @param $price
+     */
+    public function __construct($name, $price, $camera = null, $battery = null, $screen = null, $ram = null, $memory = null)
+    {
+        $this->name = $name;
+        $this->camera = $camera;
+        $this->battery = $battery;
+        $this->screen = $screen;
+        $this->ram = $ram;
+        $this->memory = $memory;
+        $this->price = $price;
+    }
+
+
+    /**
      * @ORM\PrePersist
      */
     public function onAdd()
