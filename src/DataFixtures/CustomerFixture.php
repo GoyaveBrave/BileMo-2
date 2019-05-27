@@ -29,11 +29,12 @@ class CustomerFixture extends Fixture
         $manager->persist($user);
 
         for ($i = 0; $i < 20; ++$i) {
-            $customer = new Customer();
-            $customer->setFirstname('customer '.$i);
-            $customer->setLastName('Doe');
-            $customer->setEmail('email'.$i.'@gmail.com');
-            $customer->setUser($user);
+            $customer = new Customer(
+                'customer '.$i,
+                'Doe',
+                'email'.$i.'@gmail.com',
+                $user
+            );
             $manager->persist($customer);
         }
 
