@@ -36,11 +36,12 @@ class CustomerLoader
      * @param $page
      * @param $totalPage
      *
+     * @param $maxResult
      * @return CustomersOutput
      */
-    public function loadAll($user, $page, $totalPage): CustomersOutput
+    public function loadAll($user, $page, $totalPage, $maxResult): CustomersOutput
     {
-        $customers = $this->customerRepository->findByPage($page, $user);
+        $customers = $this->customerRepository->findByPage($page, $maxResult, $user);
         $customersOutput = new CustomersOutput($customers, $this->urlGenerator, $page, $totalPage);
 
         return $customersOutput;

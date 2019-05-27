@@ -47,13 +47,14 @@ class CustomerListController extends AbstractController
     {
         $user = $this->getUser();
         $page = $request->get('page') ? $request->get('page') : 1;
-        $totalPage = $customerRepository->findMaxNumberOfPage($user);
+        $maxResult = $request->get('results') ? $request->get('results') : 5;
+        $totalPage = $customerRepository->findMaxNumberOfPage($user, $maxResult);
 
         if ($page > $totalPage || $page < 0) {
             throw new NotFoundException("La page n'existe pas");
         }
 
-        $data = $customerLoader->loadAll($user, $page, $totalPage);
+        $data = $customerLoader->loadAll($user, $page, $totalPage, $maxResult);
         $lastModified = LastModified::getLastModified($data);
 
         return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json'], $lastModified);

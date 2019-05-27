@@ -15,19 +15,19 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class PhoneRepository extends ServiceEntityRepository
 {
-    private $maxResult = 5;
 
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Phone::class);
     }
 
-    public function findByPage(int $page)
+    public function findByPage(int $page, int $maxResult)
     {
-        $firstResult = ($page - 1) * $this->maxResult;
+        $firstResult = ($page - 1) * $maxResult;
+
         return $this->createQueryBuilder('p')
             ->setFirstResult($firstResult)
-            ->setMaxResults($this->maxResult)
+            ->setMaxResults($maxResult)
             ->orderBy('p.created_at', 'DESC')
             ->getQuery()
             ->getResult()
@@ -35,15 +35,19 @@ class PhoneRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param $maxResult
+     *
+     * @return float
+     *
      * @throws NonUniqueResultException
      */
-    public function findMaxNumberOfPage()
+    public function findMaxNumberOfPage($maxResult)
     {
         $req = $this->createQueryBuilder('p')
             ->select('COUNT(p)')
             ->getQuery()
             ->getSingleScalarResult();
 
-        return ceil($req / $this->maxResult);
+        return ceil($req / $maxResult);
     }
 }

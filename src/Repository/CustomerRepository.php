@@ -16,22 +16,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class CustomerRepository extends ServiceEntityRepository
 {
-    private $maxResult = 5;
-
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Customer::class);
     }
 
-    public function findByPage(int $page, UserInterface $user)
+    public function findByPage(int $page, int $maxResult, UserInterface $user)
     {
-        $firstResult = ($page - 1) * $this->maxResult;
+        $firstResult = ($page - 1) * $maxResult;
 
         return $this->createQueryBuilder('c')
             ->andWhere('c.user = :user')
             ->setParameter('user', $user)
             ->setFirstResult($firstResult)
-            ->setMaxResults($this->maxResult)
+            ->setMaxResults($maxResult)
             ->orderBy('c.created_at', 'DESC')
             ->getQuery()
             ->getResult()
@@ -39,13 +37,14 @@ class CustomerRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param $user
+     * @param UserInterface $user
      *
+     * @param $maxResult
      * @return float|int
      *
      * @throws NonUniqueResultException
      */
-    public function findMaxNumberOfPage(UserInterface $user)
+    public function findMaxNumberOfPage(UserInterface $user, $maxResult)
     {
         $req = $this->createQueryBuilder('c')
             ->select('COUNT(c)')
@@ -54,6 +53,6 @@ class CustomerRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
-        return ceil($req / $this->maxResult);
+        return ceil($req / $maxResult);
     }
 }
