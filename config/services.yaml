@@ -38,3 +38,18 @@ services:
     App\Listener\BadRequestExceptionListener:
         tags:
             - {name: kernel.event_listener, event: kernel.exception}
+
+    acme_api.event.jwt_invalid_listener:
+        class: App\Listener\JWTInvalidListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onJWTInvalid }
+
+    acme_api.event.jwt_not_found_listener:
+        class: App\Listener\JWTNotFoundListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onJWTNotFound }
+
+    acme_api.event.jwt_expired_listener:
+        class: App\Listener\JWTExpiredListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
