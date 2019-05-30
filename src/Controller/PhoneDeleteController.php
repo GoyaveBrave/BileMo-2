@@ -26,6 +26,7 @@ class PhoneDeleteController extends AbstractController
      */
     public function deletePhone(Request $request, JsonResponderInterface $responder)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $em = $this->getDoctrine()->getManager();
         $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
 
