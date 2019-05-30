@@ -38,7 +38,7 @@ class PhoneLoader
      * @param $maxResult
      * @return PhonesOutput|void
      */
-    public function loadAll($page, $totalPage, $maxResult): PhonesOutput
+    public function loadAll(int $page, int $totalPage, int $maxResult): PhonesOutput
     {
         $phones = $this->phoneRepository->findByPage($page, $maxResult);
         $phonesOutput = new PhonesOutput($phones, $this->urlGenerator, $page, $totalPage);

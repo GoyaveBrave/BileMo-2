@@ -7,6 +7,7 @@ use App\Output\CustomerOutput;
 use App\Output\CustomersOutput;
 use App\Repository\CustomerRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class CustomerLoader
 {
@@ -39,7 +40,7 @@ class CustomerLoader
      * @param $maxResult
      * @return CustomersOutput
      */
-    public function loadAll($user, $page, $totalPage, $maxResult): CustomersOutput
+    public function loadAll(UserInterface $user, int $page, int $totalPage, int $maxResult): CustomersOutput
     {
         $customers = $this->customerRepository->findByPage($page, $maxResult, $user);
         $customersOutput = new CustomersOutput($customers, $this->urlGenerator, $page, $totalPage);
