@@ -2,33 +2,48 @@
 
 namespace App\Controller;
 
+use App\Exceptions\BadRequestException;
 use App\Responder\Interfaces\JsonResponderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthController extends AbstractController
 {
-    public function register(Request $request, UserPasswordEncoderInterface $encoder, JsonResponderInterface $responder)
+    /**
+     * @param Request                $request
+     * @param JsonResponderInterface $responder
+     * @param ValidatorInterface     $validator
+     *
+     * @return JsonResponse
+     *
+     * @throws BadRequestException
+     */
+    public function register(Request $request, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
         $em = $this->getDoctrine()->getManager();
 
         $username = $request->request->get('_username');
         $password = $request->request->get('_password');
 
-        $user = new User();
-        $user->setUsername($username);
-        $user->setPassword($encoder->encodePassword($user, $password));
+        $user = new User($username, $password);
+
+        $errors = $validator->validate($user);
+
+        if (count($errors)) {
+            throw new BadRequestException((string) $errors);
+        }
+
         $em->persist($user);
         $em->flush();
 
         $data = [
             'succes' => [
                 'code' => Response::HTTP_CREATED,
-                'message' => 'User '.$this->getUser()->getUsername().' successfully created',
+                'message' => "L'utilisateur ".$user->getUsername().' a bien été créé',
             ],
         ];
 
@@ -46,7 +61,7 @@ class AuthController extends AbstractController
         $data = [
             'succes' => [
                 'code' => Response::HTTP_OK,
-                'message' => 'Logged in as '.$this->getUser()->getUsername(),
+                'message' => 'Connecté en tant que '.$this->getUser()->getUsername(),
             ],
         ];
 

@@ -40,9 +40,12 @@ class User implements UserInterface
      */
     private $customers;
 
-    public function __construct()
+    public function __construct(string $username, string $password, array $roles = ['ROLE_USER'])
     {
         $this->customers = new ArrayCollection();
+        $this->username = $username;
+        $this->password = password_hash($password, PASSWORD_ARGON2I);
+        $this->roles = $roles;
     }
 
     public function getId(): ?int
@@ -72,26 +75,12 @@ class User implements UserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
     /**
      * @see UserInterface
      */
     public function getPassword(): string
     {
         return (string) $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
     }
 
     /**
@@ -109,21 +98,6 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Customer[]
-     */
-    public function getCustomers(): Collection
-    {
-        return $this->customers;
     }
 
     public function addCustomer(Customer $customer): self

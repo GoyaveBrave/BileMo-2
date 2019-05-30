@@ -10,22 +10,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class CustomerFixture extends Fixture
 {
-    /**
-     * @var UserPasswordEncoderInterface
-     */
-    private $encoder;
-
-    public function __construct(UserPasswordEncoderInterface $encoder)
-    {
-        $this->encoder = $encoder;
-    }
-
     public function load(ObjectManager $manager)
     {
-        $user = new User();
-        $user->setUsername('SFR');
-        $user->setPassword($this->encoder->encodePassword($user, 'password'));
-        $user->setRoles(['ROLE_USER']);
+        $user = new User('SFR', 'password');
         $manager->persist($user);
 
         for ($i = 0; $i < 20; ++$i) {
