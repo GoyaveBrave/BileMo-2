@@ -6,14 +6,11 @@ use App\DTO\CustomerDTO;
 use App\Entity\Customer;
 use App\Exceptions\BadRequestException;
 use App\Responder\Interfaces\JsonResponderInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomerCreationController extends AbstractController
@@ -22,29 +19,6 @@ class CustomerCreationController extends AbstractController
      * Create a Customer entity.
      *
      * @Route("/api/customer/creation", name="customer_creation", methods={"POST"})
-     *
-     * @SWG\Response(
-     *     response=201,
-     *     description="return a success message",
-     *     examples={"succes": {"code": 201, "message": "l'utilisateur a été ajouté."}},
-     * )
-     *
-     * @SWG\Response(
-     *     response=400,
-     *     description="The user could not be created",
-     *     examples={"error": {"code": 400, "message": "l'utilisateure n'a pas pu être créé."}},
-     * )
-     *
-     * @SWG\Parameter(
-     *     name="customer",
-     *     in="body",
-     *     description="The information of the customer",
-     *     type="json",
-     *     @SWG\Schema(ref=@Model(type=Customer::class, groups={"insert"}))
-     * )
-     *
-     * @SWG\Tag(name="Customer")
-     * @Security(name="Bearer")
      *
      * @param Request                $request
      * @param SerializerInterface    $serializer
