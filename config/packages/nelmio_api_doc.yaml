@@ -2,8 +2,449 @@ nelmio_api_doc:
     documentation:
         info:
             title: BileMo API
-            description: This is the documentation of the BileMo's API
+            description: Ceci est la documentation de l'API de BileMo
             version: 1.0.0
+        tags:
+            - name: "Authentification"
+              description: "Connexion & Token"
+            - name: "Téléphones"
+              description: "Opérations sur les téléphones"
+            - name: "Clients"
+              description: "Opération sur les clients"
+        paths:
+          /api:
+            get:
+              tags:
+                - "Authentification"
+              summary: "Information de connexion"
+              description: ""
+              operationId: "connection_information"
+              produces:
+                - "application/json"
+              responses:
+                200:
+                  description: "Connexion réussite"
+                  schema:
+                    type: "object"
+                    properties:
+                      success:
+                        type: "object"
+                        properties:
+                          code:
+                            type: "integer"
+                            example: 200
+                          message:
+                            type: "string"
+                            example: "Logged in as John Doe"
+                401:
+                  description: "Token invalide (ou expiré)"
+                  schema:
+                    type: "object"
+                    properties:
+                      error:
+                        type: "object"
+                        properties:
+                          code:
+                            type: "integer"
+                            example: 401
+                          message:
+                            type: "string"
+                            example: "Token invalide, pour avoir un token valide : /login_check"
+                403:
+                  description: "Token non trouvé"
+                  schema:
+                    type: "object"
+                    properties:
+                      error:
+                        type: "object"
+                        properties:
+                          code:
+                            type: "integer"
+                            example: 403
+                          message:
+                            type: "string"
+                            example: "Le token n'a pas été trouvé"
+
+          /login_check:
+            get:
+              tags:
+                - "Authentification"
+              summary: "Récupère un token valide"
+              description: ""
+              operationId: "login_check"
+              consumes:
+                - "application/json"
+              produces:
+                - "application/json"
+              parameters:
+                - in: "body"
+                  name: "Identifiants"
+                  description: "Votre nom de compte & mot de passe"
+                  required: true
+                  schema:
+                    type: "object"
+                    properties:
+                      username:
+                        type: "string"
+                        example: "SFR"
+                      password:
+                        type: "string"
+                        example: "motdepasse"
+              responses:
+                200:
+                  description: "Affiche le token"
+                  schema:
+                    type: "object"
+                    properties:
+                      token:
+                        type: "string"
+                        example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1NTkwNjI5ODUsImV4cCI6MTU1OTA2NjU4NSwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiU0ZSIn0.rmi-NU4_MorRSJvM3UbilsdVa9z3eiVLPa-F5Vli8HjZB1TC0kFXEKuZWpqrlO9KmbUMebHAv_XHNJ1MQIWpjmqs0drywdQhVLyccQOq3Dmg3ixKcNwMsVQCNzrRhmMxVDwW_eSsh853lsDUuJbe1IrnCvkP5FWXJU5DDcAxzL6e05cLH_mkbF041FKB71tr7qRusJEDpQX2pemlU-4tTo_C69wHT256P_au6YM9OLSPbP4v48aEtrED05KepvJazyOfFe_yPpGYob_OYNLqPWq08sziJLFKCCYXtkvesZRpUZozNNnidkUpVY98UpyDPVj9vAozlUtEUw-tYK2DcMKSOl-dwwGzJhhqJh5Yj5GPcfz59RiLCoVZREaqAdUyQxiMTdxNf5v3MEO_AiWpe7NIWurEVs9akFiJCnfyNaF7fGYF-nv2C2jDKEKCvx49a4LWBaNP-JnG6LvU3qQxy75j6On-_OmFVFJ9kvLn_TZoaBC83p0iMqLNwuP0Os8-Kfgku_yIYoPhvDqu0P2Zy_HildSqyYmdPs35-FCHM9RDamzgSjUXuK5w28eN6qzeQMJVffFGVEUhHHlCld-XfqZ9Etmlzjg-cZe8JfDJcPFsMNcHCtcbNtR8H9s0ybDGjwz9IuAjl_ziORvKRrHyjwbzP3Nd6kC6rbTBrS2wrFU"
+                401:
+                  description: "Bad credentials"
+
+          /api/phone/list:
+            get:
+              tags:
+                - "Téléphones"
+              summary: "Affiche la liste des téléphones avec une pagination"
+              description: ""
+              operationId: "phone_list"
+              produces:
+                - "application/json"
+              parameters:
+                - in: "query"
+                  name: "page"
+                  description: "Numéro de la page"
+                  type: "integer"
+                - in: "query"
+                  name: "results"
+                  description: "Nombre de résultats par page"
+                  type: "integer"
+              responses:
+                200:
+                  description: "Affiche la liste des téléphones"
+                  schema:
+                    type: "object"
+                    properties:
+                      page:
+                        type: "string"
+                        example: "3/4"
+                      links:
+                        type: "object"
+                        properties:
+                          self:
+                            type: "string"
+                            example: "/phone/list"
+                          create:
+                            type: "string"
+                            example: "/phone/creation"
+                      data:
+                        type: "array"
+                        items:
+                          $ref: "#definitions/Téléphone"
+                404:
+                  description: "La page n'existe pas"
+              security:
+                - "Bearer"
+
+          /api/phone/{id}:
+            get:
+              tags:
+                - "Téléphones"
+              summary: "Affiche un téléphone par son ID"
+              description: ""
+              operationId: "phone_show"
+              produces:
+                - "application/json"
+              parameters:
+                - in: "path"
+                  name: "id"
+                  description: "ID du téléphone"
+                  type: "integer"
+              responses:
+                200:
+                  description: "Affiche les données du téléphone"
+                  schema:
+                    type: "object"
+                    properties:
+                      links:
+                        type: "object"
+                        properties:
+                          self:
+                            type: "string"
+                            example: "/phone/5"
+                          list:
+                            type: "string"
+                            example: "/phone/list"
+                          create:
+                            type: "string"
+                            example: "/phone/creation"
+                          delete:
+                            type: "string"
+                            example: "/phone/delete/5"
+                      data:
+                        type: "object"
+                        $ref: "#definitions/Téléphone"
+                404:
+                  description: "Le portable n'existe pas."
+              security:
+                - "Bearer"
+
+#          /api/phone/creation:
+#            post:
+#              tags:
+#                - "Téléphones"
+#              summary: "Ajouter un téléphone"
+#              description: ""
+#              operationId: "phone_creation"
+#              produces:
+#                - "application/json"
+#              consumes:
+#                - "application/json"
+#              parameters:
+#                - in: "body"
+#                  name: "data"
+#                  description: "Données du téléphone"
+#                  required: true
+#                  schema:
+#                    type: "object"
+#                    properties:
+#                      name:
+#                        type: "string"
+#                      camera:
+#                        type: "string"
+#                      battery:
+#                        type: "integer"
+#                      screen:
+#                        type: "string"
+#                      ram:
+#                        type: "integer"
+#                      memory:
+#                        type: "integer"
+#                      price:
+#                        type: "integer"
+#              responses:
+#                201:
+#                  description: "Le portable a été ajouté"
+#                400:
+#                  description: "Les informations renseignées sont incorrectes"
+#              security:
+#                - "Bearer"
+
+          /api/customer/list:
+            get:
+              tags:
+                - "Clients"
+              summary: "Affiche la liste des clients avec une pagination"
+              description: "N'affiche que les clients de l'utilisateur connecté."
+              operationId: "customer_list"
+              produces:
+                - "application/json"
+              parameters:
+                - in: "query"
+                  name: "page"
+                  description: "Numéro de la page"
+                  type: "integer"
+                - in: "query"
+                  name: "results"
+                  description: "Nombre de résultats par page"
+                  type: "integer"
+              responses:
+                200:
+                  description: "Affiche la liste des clients"
+                  schema:
+                    type: "object"
+                    properties:
+                      page:
+                        type: "string"
+                        example: "2/4"
+                      links:
+                        type: "object"
+                        properties:
+                          self:
+                            type: "string"
+                            example: "/customer/list"
+                          create:
+                            type: "string"
+                            example: "/customer/creation"
+                      data:
+                        type: "array"
+                        items:
+                          $ref: "#definitions/Client"
+                404:
+                  description: "La page n'existe pas"
+              security:
+                - "Bearer"
+
+          /api/customer/{id}:
+            get:
+              tags:
+                - "Clients"
+              summary: "Affiche un client par son ID"
+              description: "L'utilisateur connecté ne peut voir que ses clients"
+              operationId: "customer_show"
+              produces:
+                - "application/json"
+              parameters:
+                - in: "path"
+                  name: "id"
+                  description: "ID du client"
+                  type: "integer"
+              responses:
+                200:
+                  description: "Affiche les données du client"
+                  schema:
+                    type: "object"
+                    properties:
+                      links:
+                        type: "object"
+                        properties:
+                          self:
+                            type: "string"
+                            example: "/customer/6"
+                          list:
+                            type: "string"
+                            example: "/customer/list"
+                          create:
+                            type: "string"
+                            example: "/customer/creation"
+                          delete:
+                            type: "string"
+                            example: "/customer/delete/6"
+                      data:
+                        type: "object"
+                        $ref: "#definitions/Client"
+                404:
+                  description: "Le client n'existe pas."
+              security:
+                - "Bearer"
+
+          /api/customer/creation:
+            post:
+              tags:
+                - "Clients"
+              summary: "Ajouter un client"
+              description: "Les clients ajoutés seront liés à l'utilisateur connecté"
+              operationId: "customer_creation"
+              produces:
+                - "application/json"
+              consumes:
+                - "application/json"
+              parameters:
+                - in: "body"
+                  name: "data"
+                  description: "Données du client"
+                  required: true
+                  schema:
+                    type: "object"
+                    properties:
+                      firstname:
+                        type: "string"
+                      lastname:
+                        type: "string"
+                      email:
+                        type: "string"
+              responses:
+                201:
+                  description: "Le client a été ajouté"
+                400:
+                  description: "Les informations renseignées sont incorrectes"
+              security:
+                - "Bearer"
+
+          /api/customer/delete/{id}:
+            delete:
+              tags:
+                - "Clients"
+              summary: "Supprime un client par son ID"
+              description: "L'utilisateur connecté ne peut supprimer que ses clients"
+              operationId: "customer_delete"
+              produces:
+                - "application/json"
+              parameters:
+                - in: "path"
+                  name: "id"
+                  description: "ID du client"
+                  type: "integer"
+              responses:
+                200:
+                  description: "L'utilisateur a été supprimé"
+                404:
+                  description: "L'utilisateur correspondant à cet ID n'existe pas ou ne vous appartient pas"
+              security:
+                - "Bearer"
+
+
+        definitions:
+          Téléphone:
+            type: "object"
+            properties:
+              type:
+                type: "string"
+                example: "phone"
+              id:
+                type: "integer"
+                example: 5
+              attributes:
+                type: "object"
+                properties:
+                  name:
+                    type: "string"
+                    example: "Pixel 4"
+                  camera:
+                    type: "string"
+                    example: "48 méga pixels"
+                  battery:
+                    type: "integer"
+                    example: 4000
+                  screen:
+                    type: "string"
+                    example: "6,6 pouces"
+                  ram:
+                    type: "integer"
+                    example: 6
+                  memory:
+                    type: "integer"
+                    example: 64
+                  price:
+                    type: "integer"
+                    example: 959
+                  created_at:
+                    type: "string"
+                    format: "date-time"
+                  updated_at:
+                    type: "string"
+                    format: "date-time"
+
+          Client:
+            type: "object"
+            properties:
+              type:
+                type: "string"
+                example: "customer"
+              id:
+                type: "integer"
+                example: 6
+              attributes:
+                type: "object"
+                properties:
+                  firstname:
+                    type: "string"
+                    example: "John"
+                  lastname:
+                    type: "string"
+                    example: "Doe"
+                  email:
+                    type: "string"
+                    example: "john@email.com"
+                  created_at:
+                    type: "string"
+                    format: "date-time"
+                  updated_at:
+                    type: "string"
+                    format: "date-time"
+
+
     areas: # to filter documented areas
         path_patterns:
-            - ^/api(?!/api/doc.json$) # Accepts routes under /api/ except /api/doc
+            - ^/api/extra(?!/api/doc.json$)
