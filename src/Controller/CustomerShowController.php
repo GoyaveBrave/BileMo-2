@@ -30,14 +30,14 @@ class CustomerShowController extends AbstractController
      */
     public function getCustomer(Request $request, JsonResponderInterface $responder, CustomerLoader $customerLoader)
     {
-        /** @var User $user */
-        $user = $this->getUser();
         /** @var Customer $customer */
-        $customer = $this->getDoctrine()->getRepository(Customer::class)->findOneBy(['user' => $user, 'id' => $request->attributes->get('id')]);
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->find($request->attributes->get('id'));
 
         if (is_null($customer)) {
             throw new NotFoundException("l'utilisateur n'existe pas.");
         }
+
+        $this->denyAccessUnlessGranted('view', $customer);
 
         $lastModified = $customer->getUpdatedAt();
         $data = $customerLoader->load($customer);
