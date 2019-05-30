@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Swagger\Annotations as SWG;
 
 class AuthController extends AbstractController
 {
@@ -37,17 +36,9 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @SWG\Response(
-     *     response=200,
-     *     description="return a success message",
-     *     examples={"succes": {"code": 200, "message": "Logged in as [username]"}},
-     * )
-     *
-     * @SWG\Tag(name="Authentification")
-     *
      * @param JsonResponderInterface $responder
+     * @param Request                $request
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function api(JsonResponderInterface $responder, Request $request)
