@@ -47,6 +47,6 @@ class CustomerDeleteController extends AbstractController
         $em->remove($customer);
         $em->flush();
 
-        return $responder($request, $data, Response::HTTP_OK, ['content-Type' => 'application/json']);
+        return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 }
