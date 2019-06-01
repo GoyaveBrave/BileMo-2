@@ -12,15 +12,17 @@ class CustomerFixture extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        $user = new User('SFR', 'password');
-        $manager->persist($user);
+        $user1 = new User('SFR', 'password');
+        $user2 = new User('Orange', 'password');
+        $manager->persist($user1);
+        $manager->persist($user2);
 
         for ($i = 0; $i < 20; ++$i) {
             $customer = new Customer(
                 'customer '.$i,
                 'Doe',
                 'email'.$i.'@gmail.com',
-                $user
+                $user1
             );
             $manager->persist($customer);
         }
