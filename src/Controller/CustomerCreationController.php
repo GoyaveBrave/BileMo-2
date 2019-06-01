@@ -55,12 +55,12 @@ class CustomerCreationController extends AbstractController
         $em->flush();
 
         $data = [
-            'succes' => [
+            'success' => [
                 'code' => Response::HTTP_CREATED,
                 'message' => "l'utilisateur a été ajouté.",
             ],
         ];
 
-        return $responder($request, $data, Response::HTTP_CREATED, ['content-Type' => 'application/json']);
+        return $responder($request, $data, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 }

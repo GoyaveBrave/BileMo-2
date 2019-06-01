@@ -1,0 +1,20 @@
+default:
+    suites:
+        api:
+            contexts:
+                - RestApiContext
+                - DoctrineContext:
+                    container: '@service_container'
+                    entityManager: '@doctrine.orm.entity_manager'
+            paths: ['%paths.base%/features/features/']
+
+    extensions:
+        Behat\Symfony2Extension:
+            kernel:
+                bootstrap: features/bootstrap/bootstrap.php
+                class: App\Kernel
+        Behat\MinkExtension:
+                    sessions:
+                        default:
+                            symfony2: ~
+        Behatch\Extension: ~
