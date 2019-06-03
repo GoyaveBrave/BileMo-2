@@ -11,6 +11,8 @@ nelmio_api_doc:
               description: "Opérations sur les téléphones"
             - name: "Clients"
               description: "Opération sur les clients"
+        schemes:
+          - "http"
         paths:
           /api:
             get:
@@ -64,9 +66,11 @@ nelmio_api_doc:
                           message:
                             type: "string"
                             example: "Le token n'a pas été trouvé"
+              security:
+                - BearerAuth: []
 
           /login_check:
-            get:
+            post:
               tags:
                 - "Authentification"
               summary: "Récupère un token valide"
@@ -145,7 +149,7 @@ nelmio_api_doc:
                 404:
                   description: "La page n'existe pas"
               security:
-                - "Bearer"
+                - BearerAuth: []
 
           /api/phone/{id}:
             get:
@@ -188,7 +192,7 @@ nelmio_api_doc:
                 404:
                   description: "Le portable n'existe pas."
               security:
-                - "Bearer"
+                - BearerAuth: []
 
 #          /api/phone/creation:
 #            post:
@@ -229,7 +233,7 @@ nelmio_api_doc:
 #                400:
 #                  description: "Les informations renseignées sont incorrectes"
 #              security:
-#                - "Bearer"
+#                - BearerAuth: [
 
           /api/customer/list:
             get:
@@ -274,7 +278,7 @@ nelmio_api_doc:
                 404:
                   description: "La page n'existe pas"
               security:
-                - "Bearer"
+                - BearerAuth: []
 
           /api/customer/{id}:
             get:
@@ -317,7 +321,7 @@ nelmio_api_doc:
                 404:
                   description: "Le client n'existe pas."
               security:
-                - "Bearer"
+                - BearerAuth: []
 
           /api/customer/creation:
             post:
@@ -350,7 +354,7 @@ nelmio_api_doc:
                 400:
                   description: "Les informations renseignées sont incorrectes"
               security:
-                - "Bearer"
+                - BearerAuth: []
 
           /api/customer/delete/{id}:
             delete:
@@ -372,8 +376,14 @@ nelmio_api_doc:
                 404:
                   description: "L'utilisateur correspondant à cet ID n'existe pas ou ne vous appartient pas"
               security:
-                - "Bearer"
+                - BearerAuth: []
 
+        securityDefinitions:
+          BearerAuth:
+            type: "apiKey"
+            description: "Value: Bearer {jwt}"
+            name: "Authorization"
+            in: "header"
 
         definitions:
           Téléphone:
