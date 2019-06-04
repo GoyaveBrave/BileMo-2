@@ -5,7 +5,7 @@ Feature:
   Scenario: User not logged in
     Given I am an unauthenticated user
     When I send a "GET" request to "/api/customer/10"
-    Then the response header "Content-Type" should be equal to "application/json"
+    Then the response header "content-type" should be equal to "application/json"
     And the response code should be 403
     And the JSON node "error.message" should be equal to "Le token n'a pas été trouvé"
 
@@ -13,7 +13,7 @@ Feature:
   Scenario: Customer is not owned by the user
     Given I am successfully logged in with username: "Orange", and password: "password"
     When I send a "GET" request to "/api/customer/10"
-    Then the response header "Content-Type" should be equal to "application/json"
+    Then the response header "content-type" should be equal to "application/json"
     And the response code should be 403
     And the JSON node "error.message" should be equal to "L'accès a été refusé."
 
@@ -21,7 +21,7 @@ Feature:
   Scenario: Customer not found
     Given I am successfully logged in with username: "SFR", and password: "password"
     When I send a "GET" request to "/api/customer/200"
-    Then the response header "Content-Type" should be equal to "application/json"
+    Then the response header "content-type" should be equal to "application/json"
     And the response code should be 404
     And the JSON node "error.message" should be equal to "l'utilisateur n'existe pas."
 
@@ -29,7 +29,7 @@ Feature:
   Scenario: User logged in and customer found
     Given I am successfully logged in with username: "SFR", and password: "password"
     When I send a "GET" request to "/api/customer/10"
-    Then the response header "Content-Type" should be equal to "application/json"
+    Then the response header "content-type" should be equal to "application/json"
     And the response code should be 200
     And the JSON should be valid according to this schema:
     """

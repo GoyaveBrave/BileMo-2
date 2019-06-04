@@ -36,7 +36,7 @@ class PhoneDeleteController extends AbstractController
 
         $httpCode = Response::HTTP_OK;
         $data = [
-            'succes' => [
+            'success' => [
                 'code' => $httpCode,
                 'message' => 'le portable '.$phone->getName().' a été supprimé.',
             ],

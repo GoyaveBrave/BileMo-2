@@ -5,24 +5,22 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
 use Behatch\Json\JsonSchema;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Request;
-use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert as Assertions;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class RestApiContext implements Context
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
     private $headers = [];
 
+    private $token;
+
     /**
-     * @var ClientInterface
+     * @var HttpClient
      */
     protected $client;
 
@@ -39,12 +37,10 @@ class RestApiContext implements Context
     /**
      * RestApiContext constructor.
      *
-     * @param \Behatch\HttpCall\Request $request
      */
-    public function __construct(\Behatch\HttpCall\Request $request)
+    public function __construct()
     {
-        $this->client = new Client(['base_uri' => 'http://127.0.0.1:8000']);
-        $this->request = $request;
+        $this->client = HttpClient::create(['base_uri' => 'http://127.0.0.1:8000']);
     }
 
     /**
@@ -53,11 +49,15 @@ class RestApiContext implements Context
      * @param string $username
      * @param string $password
      *
+     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
      * @Given /^I am successfully logged in with username: "([^"]*)", and password: "([^"]*)"$/
      */
     public function iAmSuccessfullyLoggedInWithUsernameAndPassword($username, $password)
     {
-        $response = $this->client->post('login_check', [
+        $response = $this->client->request('POST', '/login_check', [
             'json' => [
                 'username' => $username,
                 'password' => $password,
@@ -66,19 +66,21 @@ class RestApiContext implements Context
 
         Assertions::assertEquals(200, $response->getStatusCode());
 
-        $responseBody = json_decode($response->getBody(), true);
+        $responseBody = json_decode($response->getContent(), true);
 
         $this->addHeader('Authorization', 'Bearer '.$responseBody['token']);
+        $this->addToken($responseBody['token']);
     }
 
     /**
      * @Given I am an unauthenticated user
      *
      * @throws Exception
+     * @throws TransportExceptionInterface
      */
     public function iAmAnUnAuthenticatedUser()
     {
-        $response = $this->client->get('/api/doc');
+        $response = $this->client->request('GET', '/api/doc');
         $responseCode = $response->getStatusCode();
 
         if (200 != $responseCode) {
@@ -94,15 +96,17 @@ class RestApiContext implements Context
      * @param string $method request method
      * @param string $url    relative url
      *
-     * @throws GuzzleException
+     * @throws Exception
      * @When /^(?:I )?send a "([A-Z]+)" request to "([^"]+)"$/
      */
     public function iSendARequest($method, $url)
     {
         $url = $this->prepareUrl($url);
-        $this->request = new Request($method, $url, (!empty($this->headers)) ? $this->headers : []);
-
-        $this->sendRequest();
+        try {
+            $this->response = $this->client->request($method, $url, (!empty($this->token)) ? ['auth_bearer' => $this->token] : []);
+        } catch (TransportExceptionInterface $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 
     /**
@@ -114,16 +118,17 @@ class RestApiContext implements Context
      *
      * @When /^(?:I )?send a "([A-Z]+)" request to "([^"]+)" with body:$/
      *
-     * @throws GuzzleException
+     * @throws TransportExceptionInterface
      */
     public function iSendARequestWithBody($method, $url, PyStringNode $string)
     {
         $url = $this->prepareUrl($url);
         $string = $this->replacePlaceHolder(trim($string));
 
-        $this->request = new Request($method, $url, (!empty($this->headers)) ? $this->headers : [], $string);
-
-        $this->sendRequest();
+        $this->response = $this->client->request($method, $url, [
+            'auth_bearer' => $this->token,
+            'body' => $string,
+        ]);
     }
 
     protected function addHeader($name, $value)
@@ -139,32 +144,9 @@ class RestApiContext implements Context
         }
     }
 
-    /**
-     * @throws GuzzleException
-     */
-    private function sendRequest()
+    protected function addToken($value)
     {
-        try {
-            $this->response = $this->getClient()->send($this->request);
-        } catch (GuzzleException $e) {
-            $this->response = $e->getResponse();
-
-            if (null === $this->response) {
-                throw $e;
-            }
-        }
-    }
-
-    /**
-     * @return Client
-     */
-    private function getClient()
-    {
-        if (null === $this->client) {
-            throw new RuntimeException('Client has not been set in WebApiContext');
-        }
-
-        return $this->client;
+        $this->token = $value;
     }
 
     private function prepareUrl($url)
@@ -194,6 +176,8 @@ class RestApiContext implements Context
      * @param string $code status code
      *
      * @Then the response code should be :arg1
+     *
+     * @throws TransportExceptionInterface
      */
     public function theResponseCodeShouldBe($code)
     {
@@ -208,11 +192,18 @@ class RestApiContext implements Context
      *
      * @Then the JSON node :node should be equal to :text
      *
+     * @param $node
+     * @param $text
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      * @throws Exception
      */
     public function theJsonNodeShouldBeEqualTo($node, $text)
     {
-        $json = new Json($this->response->getBody()->getContents());
+        $json = new Json($this->response->getContent(false));
 
         $inspector = new JsonInspector('javascript');
 
@@ -230,10 +221,15 @@ class RestApiContext implements Context
      *
      * @param $header
      * @param $value
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function theResponseHeaderShouldBeEqualTo($header, $value)
     {
-        $header = $this->response->getHeaders()[$header];
+        $header = $this->response->getHeaders(false)[$header];
         Assertions::assertContains($value, $header);
     }
 
@@ -241,12 +237,17 @@ class RestApiContext implements Context
      * @Then the JSON should be valid according to this schema:
      *
      * @param PyStringNode $schema
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function theJsonShouldBeValidAccordingToThisSchema(PyStringNode $schema)
     {
         $inspector = new JsonInspector('javascript');
 
-        $json = new Json($this->response->getBody()->getContents());
+        $json = new Json($this->response->getContent(false));
 
         $inspector->validate(
             $json,
@@ -268,18 +269,22 @@ class RestApiContext implements Context
      * Prints last response body.
      *
      * @Then print response
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function printResponse()
     {
-        $request = $this->request;
         $response = $this->response;
 
         echo sprintf(
             "%s %s => %d:\n%s",
-            $request->getMethod(),
-            $request->getUri(),
+            $response->getInfo('http_method'),
+            $response->getInfo('url'),
             $response->getStatusCode(),
-            $response->getBody()
+            $response->getContent(false)
         );
     }
 }

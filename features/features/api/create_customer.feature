@@ -5,8 +5,8 @@ Feature:
   Scenario: User not logged in
     Given I am an unauthenticated user
     When I send a "GET" request to "/api/customer/creation"
-    Then the response header "Content-Type" should be equal to "application/json"
-    And the response code should be 403
+    Then the response code should be 403
+    And the response header "content-type" should be equal to "application/json"
     And the JSON node "error.message" should be equal to "Le token n'a pas été trouvé"
 
   @create_customer_logged_in
@@ -21,7 +21,7 @@ Feature:
     }
     """
     Then the response code should be 201
-    And the response header "Content-Type" should be equal to "application/json"
+    And the response header "content-type" should be equal to "application/json"
     And the JSON node "success.message" should be equal to "l'utilisateur a été ajouté."
 
   @create_customer_invalid_body
@@ -36,6 +36,6 @@ Feature:
     }
     """
     Then the response code should be 400
-    And the response header "Content-Type" should be equal to "application/json"
+    And the response header "content-type" should be equal to "application/json"
     And print response
 

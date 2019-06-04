@@ -58,7 +58,7 @@ class PhoneCreationController extends AbstractController
         $em->flush();
 
         $data = [
-            'succes' => [
+            'success' => [
                 'code' => Response::HTTP_CREATED,
                 'message' => 'le portable '.$phone->getName().' a été ajouté.',
             ],
