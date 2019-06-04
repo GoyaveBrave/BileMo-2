@@ -41,7 +41,7 @@ class AuthController extends AbstractController
         $em->flush();
 
         $data = [
-            'succes' => [
+            'success' => [
                 'code' => Response::HTTP_CREATED,
                 'message' => "L'utilisateur ".$user->getUsername().' a bien été créé',
             ],
@@ -59,7 +59,7 @@ class AuthController extends AbstractController
     public function api(JsonResponderInterface $responder, Request $request)
     {
         $data = [
-            'succes' => [
+            'success' => [
                 'code' => Response::HTTP_OK,
                 'message' => 'Connecté en tant que '.$this->getUser()->getUsername(),
             ],

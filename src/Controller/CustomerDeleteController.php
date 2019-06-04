@@ -38,7 +38,7 @@ class CustomerDeleteController extends AbstractController
 
         $httpCode = Response::HTTP_OK;
         $data = [
-            'succes' => [
+            'success' => [
                 'code' => $httpCode,
                 'message' => "l'utilisateur a été supprimé.",
             ],
