@@ -6,9 +6,9 @@ Run the following commands in your terminal
 
 Configuration of JWT
 ```bash
-mkdir config/jwt
-openssl genrsa -out config/jwt/private.pem -aes256 4096
-openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+$ mkdir config/jwt
+$ openssl genrsa -out config/jwt/private.pem -aes256 4096
+$ openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
 ```
 
 In case first openssl command forces you to input password use following to get the private key decrypted
