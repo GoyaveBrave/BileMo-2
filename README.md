@@ -1,4 +1,5 @@
-#Installation
+# Installation
+
 Run the following commands in your terminal
 - `git clone https://github.com/RomainDW/BileMo.git`
 - `cd BileMo/`
@@ -28,7 +29,7 @@ Then run the following commands in your terminal
 
 Done. Check the API documentation on /api/doc
 
-#Tests
+# Tests
 To run tests, you have to configure the test environment :
 in .dev.test, update the `DATABASE_URL` with your database information and the `BASE_URI` with your base uri.
 
