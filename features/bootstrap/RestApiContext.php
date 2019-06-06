@@ -40,7 +40,7 @@ class RestApiContext implements Context
      */
     public function __construct()
     {
-        $this->client = HttpClient::create(['base_uri' => 'http://127.0.0.1:8000']);
+        $this->client = HttpClient::create(['base_uri' => $_ENV['BASE_URI']]);
     }
 
     /**
