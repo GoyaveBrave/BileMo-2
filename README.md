@@ -31,7 +31,7 @@ The fixtures provide you 2 users (SFR & Orange with the password "password"), ea
 
 Check the API documentation on `/api/doc`
 
-#Requests
+# Requests
 To make a request, a token is required. To have this token, you have to send a POST request on `/login_check` with login credentials in the body.
 Example :
 ```bash
