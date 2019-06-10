@@ -27,7 +27,27 @@ Then run the following commands in your terminal
 - `php bin/console doctrine:fixture:load`
 - `php bin/console server:start`
 
-Done. Check the API documentation on /api/doc
+The fixtures provide you 2 users (SFR & Orange with the password "password"), each user has 10 customers.
+
+Check the API documentation on `/api/doc`
+
+#Requests
+To make a request, a token is required. To have this token, you have to send a POST request on `/login_check` with login credentials in the body.
+Example :
+```bash
+curl --request POST \
+  --url http://127.0.0.1:8000/login_check \
+  --header 'content-type: application/json' \
+  --data '{"username":"SFR","password":"password"}'
+```
+
+Now for each request, you must fill in the token in the headers like this :
+
+```bash
+curl --request GET \
+  --url http://127.0.0.1:8000/api \
+  --header 'authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1NjAxNzUyOTAsImV4cCI6MTU2MDE3ODg5MCwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiU0ZSIn0.40t8XvZMgvv0NMlmCfxDy-5q_8s3BcsvlH_XUFJhuv827LCrNUVxNNYko_5FtHlXWd8W97F8dDWdDiRsOUYn_EYDXepLSjBVGYRWzdgkFRIon5KyNuM7DwG2FIPeJGFJ6jooPuDiQDqFoky4nNoVq7dlVpXm8-H4xMb75S71EQIG_84BFmETv_yJ7q4QNgPVJ_nFTnPwE4aMASr8fzqxGsEPsWI_rdZachpQYsLoX6jFmbkWoxVF3jTTmeXZLoasBrlWLbo-OpepSh70HaXLDGJ3zSzNEvwLGTUCVWGEo-jC7OC_dRDUIVDH6r_bY9Yc1Q2xz5UneR5mDSPAetjsHC8Wkfx7GawPFORkxkuzXoC1h2Jb0B-XpXp0E7-aW5-Syj0iXKQ4uH-_e666U3bZTAP2cromFOO_f-jmy-WptCiNR38-J927A4Zo0nS5-g-JAvRs44pogVg-qdv0XNYV3ZtansVoRoZ_yUy_tMrzeRWpTwVvA4Ben5XFOnRtBYe8jCzGqWNW8-0EDkQwbo91stcwjdsqT3LoURl88JlUyRZRwH5kvKypDjA24DuVwxKlEmJ-pS7TRZF8TxX3ZMmQH7pzNV6NT85VHkDJiccgIUW_3Wrke5p7CY-5MBDZMjzpxLjp5kOHvDWLCCplUc9u0SxhI7E1o_Jt-cFxbzvREuc'
+```
 
 # Tests
 To run tests, you have to configure the test environment :
