@@ -17,12 +17,26 @@ class CustomerFixture extends Fixture
         $manager->persist($user1);
         $manager->persist($user2);
 
-        for ($i = 0; $i < 20; ++$i) {
+        //SFR customers
+        for ($i = 0; $i < 10; ++$i) {
+            $number = $i + 1;
             $customer = new Customer(
-                'customer '.$i,
+                'customer '.$number,
                 'Doe',
-                'email'.$i.'@gmail.com',
+                'email'.$number.'@gmail.com',
                 $user1
+            );
+            $manager->persist($customer);
+        }
+
+        //Orange customers
+        for ($i = 10; $i < 20; ++$i) {
+            $number = $i + 1;
+            $customer = new Customer(
+                'customer '.$number,
+                'Doe',
+                'email'.$number.'@gmail.com',
+                $user2
             );
             $manager->persist($customer);
         }
