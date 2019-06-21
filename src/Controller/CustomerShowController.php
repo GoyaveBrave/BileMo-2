@@ -33,7 +33,7 @@ class CustomerShowController extends AbstractController
         /** @var Customer $customer */
         $customer = $this->getDoctrine()->getRepository(Customer::class)->find($request->attributes->get('id'));
 
-        if (is_null($customer)) {
+        if (null === $customer) {
             throw new NotFoundException("l'utilisateur n'existe pas.");
         }
 

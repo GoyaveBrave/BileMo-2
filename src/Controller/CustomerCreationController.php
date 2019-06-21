@@ -31,7 +31,7 @@ class CustomerCreationController extends AbstractController
      */
     public function createCustomer(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
-        $em = $this->getDoctrine()->getManager();
+        $manager = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
 
         /** @var CustomerDTO $customerDTO */
@@ -51,8 +51,8 @@ class CustomerCreationController extends AbstractController
             throw new BadRequestException($errorsMessage);
         }
 
-        $em->persist($customer);
-        $em->flush();
+        $manager->persist($customer);
+        $manager->flush();
 
         $data = [
             'success' => [

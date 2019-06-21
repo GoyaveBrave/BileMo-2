@@ -123,7 +123,7 @@ class Phone
 
     public function getAttributes(): array
     {
-        return $attributes = [
+        return [
             'name' => $this->name,
             'camera' => $this->camera,
             'battery' => $this->battery,
