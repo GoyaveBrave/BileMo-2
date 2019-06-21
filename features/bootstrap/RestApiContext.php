@@ -36,7 +36,6 @@ class RestApiContext implements Context
 
     /**
      * RestApiContext constructor.
-     *
      */
     public function __construct()
     {
@@ -139,9 +138,11 @@ class RestApiContext implements Context
             }
 
             $this->headers[$name][] = $value;
-        } else {
-            $this->headers[$name] = $value;
+
+            return;
         }
+
+        $this->headers[$name] = $value;
     }
 
     protected function addToken($value)
