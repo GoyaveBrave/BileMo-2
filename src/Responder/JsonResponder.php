@@ -31,7 +31,7 @@ class JsonResponder implements JsonResponderInterface
 
         if ($request->isMethodCacheable()) {
             $response->setCache([
-                'etag' => md5($response->getContent()),
+                'etag' => hash('sha256', $response->getContent()),
                 'max_age' => 15,
                 's_maxage' => 15,
                 'public' => true,
