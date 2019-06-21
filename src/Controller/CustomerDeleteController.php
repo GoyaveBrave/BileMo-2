@@ -30,7 +30,7 @@ class CustomerDeleteController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
         $customer = $manager->getRepository(Customer::class)->find($request->attributes->get('id'));
 
-        if (is_null($customer)) {
+        if (null === $customer) {
             throw new NotFoundException("l'utilisateur n'existe pas.");
         }
 

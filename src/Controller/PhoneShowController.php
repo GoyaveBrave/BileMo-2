@@ -32,7 +32,7 @@ class PhoneShowController extends AbstractController
         /** @var Phone $phone */
         $phone = $this->getDoctrine()->getRepository(Phone::class)->find($request->attributes->get('id'));
 
-        if (is_null($phone)) {
+        if (null === $phone) {
             throw new NotFoundException("le portable n'existe pas.");
         }
 

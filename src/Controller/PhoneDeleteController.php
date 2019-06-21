@@ -30,7 +30,7 @@ class PhoneDeleteController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
         $phone = $manager->getRepository(Phone::class)->find($request->attributes->get('id'));
 
-        if (is_null($phone)) {
+        if (null === $phone) {
             throw new NotFoundException("le portable n'existe pas.");
         }
 
