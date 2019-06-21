@@ -115,7 +115,7 @@ class Customer
 
     public function getAttributes(): array
     {
-        return $attributes = [
+        return [
             'first_name' => $this->firstname,
             'last_name' => $this->lastname,
             'email' => $this->email,
