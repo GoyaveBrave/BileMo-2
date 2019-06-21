@@ -27,8 +27,8 @@ class PhoneDeleteController extends AbstractController
     public function deletePhone(Request $request, JsonResponderInterface $responder)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $em = $this->getDoctrine()->getManager();
-        $phone = $em->getRepository(Phone::class)->find($request->attributes->get('id'));
+        $manager = $this->getDoctrine()->getManager();
+        $phone = $manager->getRepository(Phone::class)->find($request->attributes->get('id'));
 
         if (is_null($phone)) {
             throw new NotFoundException("le portable n'existe pas.");
@@ -42,8 +42,8 @@ class PhoneDeleteController extends AbstractController
             ],
         ];
 
-        $em->remove($phone);
-        $em->flush();
+        $manager->remove($phone);
+        $manager->flush();
 
         return $responder($request, $data, $httpCode, ['content-Type' => 'application/json']);
     }

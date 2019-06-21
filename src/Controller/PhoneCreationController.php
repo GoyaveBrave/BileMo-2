@@ -32,7 +32,7 @@ class PhoneCreationController extends AbstractController
     public function createPhone(Request $request, SerializerInterface $serializer, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $em = $this->getDoctrine()->getManager();
+        $manager = $this->getDoctrine()->getManager();
         $requestContent = $request->getContent();
         /** @var PhoneDTO $phoneDTO */
         $phoneDTO = $serializer->deserialize($requestContent, PhoneDTO::class, 'json');
@@ -54,8 +54,8 @@ class PhoneCreationController extends AbstractController
 
         }
 
-        $em->persist($phone);
-        $em->flush();
+        $manager->persist($phone);
+        $manager->flush();
 
         $data = [
             'success' => [

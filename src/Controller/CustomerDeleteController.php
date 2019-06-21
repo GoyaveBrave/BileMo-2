@@ -27,8 +27,8 @@ class CustomerDeleteController extends AbstractController
      */
     public function deleteCustomer(Request $request, JsonResponderInterface $responder)
     {
-        $em = $this->getDoctrine()->getManager();
-        $customer = $em->getRepository(Customer::class)->find($request->attributes->get('id'));
+        $manager = $this->getDoctrine()->getManager();
+        $customer = $manager->getRepository(Customer::class)->find($request->attributes->get('id'));
 
         if (is_null($customer)) {
             throw new NotFoundException("l'utilisateur n'existe pas.");
@@ -44,8 +44,8 @@ class CustomerDeleteController extends AbstractController
             ],
         ];
 
-        $em->remove($customer);
-        $em->flush();
+        $manager->remove($customer);
+        $manager->flush();
 
         return $responder($request, $data, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }

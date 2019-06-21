@@ -24,7 +24,7 @@ class AuthController extends AbstractController
      */
     public function register(Request $request, JsonResponderInterface $responder, ValidatorInterface $validator)
     {
-        $em = $this->getDoctrine()->getManager();
+        $manager = $this->getDoctrine()->getManager();
 
         $username = $request->request->get('_username');
         $password = $request->request->get('_password');
@@ -37,8 +37,8 @@ class AuthController extends AbstractController
             throw new BadRequestException((string) $errors);
         }
 
-        $em->persist($user);
-        $em->flush();
+        $manager->persist($user);
+        $manager->flush();
 
         $data = [
             'success' => [
